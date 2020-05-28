@@ -1,4 +1,6 @@
 # Rss Parsing:
+### Files:
+* [rss\_parsing\_notebook.ipynb:](https://github.com/garyhsu29/chinese_nlp/blob/master/crawler/rss_parsing_notebook.ipynb) 使用 Requests，Regular Expression 以及少量的 BeautifulSoup function來取得所有在Rss Feeds上的新聞網址。
 
 ## Rss Feed could be:  
 - Multiple Rss Urls
