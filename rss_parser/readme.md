@@ -1,6 +1,8 @@
 # Rss Parsing:
 ### Files:
 * [rss\_parsing\_notebook.ipynb:](https://github.com/garyhsu29/chinese_nlp/blob/master/crawler/rss_parsing_notebook.ipynb) 使用 Requests，Regular Expression 以及少量的 BeautifulSoup function來取得所有在Rss Feeds上的新聞網址。
+*  [rss_parser.py](https://github.com/garyhsu29/chinese_nlp/blob/master/rss_parser/rss_parser.py) 把 notebook 格式的程式碼轉換成可使用 crontab 定時執行的 .py 格式
+*  logs/
 
 ## Rss Feed could be:  
 - Multiple Rss Urls
