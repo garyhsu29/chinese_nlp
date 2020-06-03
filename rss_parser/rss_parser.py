@@ -11,7 +11,9 @@ import pickle
 with open('loc2server.config', 'rb') as f:
     configs = pickle.load(f)
 """
-with open('server2server.config', 'rb') as f:
+DIR_PATH = os.path.dirname(os.path.realpath(__file__))
+
+with open(os.path.join(DIR_PATH,'server2server.config'), 'rb') as f:
     configs = pickle.load(f)
 
 mydb = mysql.connector.connect(
@@ -22,7 +24,7 @@ mydb = mysql.connector.connect(
 )
 
 
-DIR_PATH = os.path.dirname(os.path.realpath(__file__))
+
 
 # Information for logging
 FORMAT = '%(asctime)s %(levelname)s: %(message)s'
