@@ -1,34 +1,19 @@
 # Rss Parsing:
 ![rss_parser_image](./rss_parser.png)
-## Data Structure:
-### DDL:
-```sql
-CREATE TABLE news_db.`news_rss_feeds` (
-  `news_rss_feeds_id` int(11) NOT NULL AUTO_INCREMENT,
-  `news_url` varchar(500) CHARACTER SET utf8mb4 NOT NULL,
-  `news_source` varchar(100) CHARACTER SET utf8mb4 NOT NULL,
-  `news_category` varchar(100) CHARACTER SET utf8mb4 DEFAULT NULL,
-  `processed_status` tinyint(4) NOT NULL DEFAULT '0',
-  `processed_success` tinyint(4) NOT NULL DEFAULT '0',
-  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`news_rss_feeds_id`),
-  UNIQUE KEY `rss_id_UNIQUE` (`news_rss_feeds_id`),
-  UNIQUE KEY `unique_source_category_url` (`news_source`,`news_category`,`news_url`)
-) ENGINE=InnoDB AUTO_INCREMENT=3974394 DEFAULT CHARSET=utf8mb4;
-```
-### Data Structure Explanation:
+
+## Files:
+* [rss\_parsing\_notebook.ipynb:](https://github.com/garyhsu29/chinese_nlp/blob/master/crawler/rss_parsing_notebook.ipynb): 使用 Requests，Regular Expression 以及少量的 BeautifulSoup function來取得所有在Rss Feeds上的新聞網址。
+*  [rss_parser.py](https://github.com/garyhsu29/chinese_nlp/blob/master/rss_parser/rss_parser.py): 把 notebook 格式的程式碼轉換成可使用 crontab 定時執行的 .py 格式
+*  [logs/](https://github.com/garyhsu29/chinese_nlp/tree/master/rss_parser/logs): 所有關於 rss parsing 的 log 都會存放在這個 folder 之中. 
+*  
+
+## Data Structure Explanation:
 * news\_rss\_feeds\_id: primary key for table news\_rss\_feeds
 * news\_url: stores the url from rss feeds
 * news\_source: stores the rss\_sourcs where the news_urls came from
 * news\_category: stores the news categories (not implemented yet), because the news category could be extracted from news parsing level
 *  processed\_status: stores whether this rss feed was processed
 *  processed\_success: stores whether this rss feed was processed successfully
-
-## Files:
-* [rss\_parsing\_notebook.ipynb:](https://github.com/garyhsu29/chinese_nlp/blob/master/crawler/rss_parsing_notebook.ipynb): 使用 Requests，Regular Expression 以及少量的 BeautifulSoup function來取得所有在Rss Feeds上的新聞網址。
-*  [rss_parser.py](https://github.com/garyhsu29/chinese_nlp/blob/master/rss_parser/rss_parser.py): 把 notebook 格式的程式碼轉換成可使用 crontab 定時執行的 .py 格式
-*  [logs/](https://github.com/garyhsu29/chinese_nlp/tree/master/rss_parser/logs): 所有關於 rss parsing 的 log 都會存放在這個 folder 之中. 
 
 ## Rss Feed could be:  
 - Multiple Rss Urls
