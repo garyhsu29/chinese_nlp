@@ -2,7 +2,8 @@
 ![News Parsing Image](./news_parser.png)
 
 ## Files:
-* [content\_parser.py](https://github.com/garyhsu29/chinese_nlp/blob/master/news_parser/content_parser.py) 負責處理資料的輸入輸出(SELECT, INSERT) 還有更新 processed_status, processed_success
+* [content\_source\_top10.ipynb](https://github.com/garyhsu29/chinese_nlp/blob/master/news_parser/content_source_top10.ipynb): news parser 的開發 notebook
+* [content\_parser.py](https://github.com/garyhsu29/chinese_nlp/blob/master/news_parser/content_parser.py): 負責處理資料的輸入輸出(SELECT, INSERT) 還有更新 processed\_status, processed\_success
 * [*\_content\_parser.py](https://github.com/garyhsu29/chinese_nlp/blob/master/news_parser/epoch_content_parser.py): 負責處理新聞來源 * 的 python script
 
 | # news_source                                                                                             | Status                    |
