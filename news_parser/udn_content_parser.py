@@ -7,9 +7,13 @@ import datetime
 import time
 from content_parser import ContentParser
 
+start = time.time()
+
+requests.adapters.DEFAULT_RETRIES = 5 
+
 def udn_content_processor(url):
     res_dict = {}
-    r = requests.get(url, headers = headers)
+    r = requests.get(url, headers = content_parser.headers)
     r.encoding='utf-8'
     web_content = r.text
     soup = BeautifulSoup(web_content, "lxml")
@@ -47,16 +51,14 @@ def udn_content_processor(url):
 
     if time_tag:
         try:
-
             d1 = datetime.datetime.strptime(time_tag.find('span').text, "%Y-%m-%d %H:%M")
-            print(d1)
             d1 -= datetime.timedelta(hours=8)
             db_date_format = '%Y-%m-%d %H:%M:%S'
             date_res = d1.strftime(db_date_format)
             res_dict['news_published_date'] = date_res
         except Exception as e1:
             try:
-                d1 = datetime.datetime.strptime(time_tag.get('content'), "%Y-%m-%d %H:%M:%S") 
+                d1 = datetime.datetime.strptime(time_tag.find('span').text, "%Y-%m-%d %H:%M:%S") 
                 d1 -= datetime.timedelta(hours=8)
                 db_date_format = '%Y-%m-%d %H:%M:%S'
                 date_res = d1.strftime(db_date_format)
@@ -88,7 +90,16 @@ def udn_content_processor(url):
     if content:
         res_dict['news'] = content
 
-    if not res_dict or 'content' not in res_dict:
-        content_parser.logger.error('Epoch url: {} did not process properly'.format(url))
+    if not res_dict or 'news' not in res_dict:
+        content_parser.logger.error('UDN url: {} did not process properly'.format(url))
 
     return res_dict
+
+content_parser = ContentParser('經濟日報')
+# Query the data with source name
+unprocessed_data = content_parser.content_query()
+
+content_parser.content_processor(unprocessed_data, udn_content_processor)
+content_parser.encoding_cursor.close()
+content_parser.mydb.close()
+content_parser.logger.info("Processed UDN {} examples in {} seconds".format(len(unprocessed_data), time.time() - start))
