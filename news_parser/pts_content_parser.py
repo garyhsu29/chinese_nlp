@@ -57,8 +57,8 @@ def pts_content_processor(url):
             res_dict['news'] = content
             
     if not res_dict or 'news' not in res_dict:
-        return
         content_parser.logger.error('PTS url: {} did not process properly'.format(url))
+        return
 
     return res_dict
 

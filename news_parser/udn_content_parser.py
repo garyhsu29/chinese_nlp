@@ -92,6 +92,7 @@ def udn_content_processor(url):
 
     if not res_dict or 'news' not in res_dict:
         content_parser.logger.error('UDN url: {} did not process properly'.format(url))
+        return 
 
     return res_dict
 
