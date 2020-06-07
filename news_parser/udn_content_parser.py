@@ -1,0 +1,94 @@
+import logging
+import mysql.connector
+import os
+import requests
+from bs4 import BeautifulSoup
+import datetime
+import time
+from content_parser import ContentParser
+
+def udn_content_processor(url):
+    res_dict = {}
+    r = requests.get(url, headers = headers)
+    r.encoding='utf-8'
+    web_content = r.text
+    soup = BeautifulSoup(web_content, "lxml")
+    if not soup:
+        return 
+    title_tag = soup.find("title")
+    if title_tag:
+        title_category_lst = title_tag.string.split(' | ', 3)
+        res_dict['news_title'] = title_category_lst[0]
+        try:
+            res_dict['news_category'] = title_category_lst[2]
+        except:
+            pass
+        
+        
+        
+    fb_app_tag = soup.find('meta', attrs = {'property':'fb:app_id'})
+    if fb_app_tag:
+        res_dict['news_fb_app_id'] = str(fb_app_tag['content'])
+
+    fb_page_tag = soup.find('meta', attrs = {'property':'fb:pages'})
+    if fb_page_tag:
+        res_dict['news_fb_page'] = str(fb_page_tag['content'])
+
+    #Optional
+    keywords_tag = soup.find('meta', attrs={'name': 'news_keywords'})
+    if keywords_tag:
+        res_dict['news_keywords'] = keywords_tag['content']
+
+    description_tag = soup.find('meta', attrs = {'name': 'description'})
+    if description_tag:
+        res_dict['news_description'] = description_tag['content']
+
+    time_tag = soup.find('div', attrs = {'class': 'shareBar__info--author'})
+
+    if time_tag:
+        try:
+
+            d1 = datetime.datetime.strptime(time_tag.find('span').text, "%Y-%m-%d %H:%M")
+            print(d1)
+            d1 -= datetime.timedelta(hours=8)
+            db_date_format = '%Y-%m-%d %H:%M:%S'
+            date_res = d1.strftime(db_date_format)
+            res_dict['news_published_date'] = date_res
+        except Exception as e1:
+            try:
+                d1 = datetime.datetime.strptime(time_tag.get('content'), "%Y-%m-%d %H:%M:%S") 
+                d1 -= datetime.timedelta(hours=8)
+                db_date_format = '%Y-%m-%d %H:%M:%S'
+                date_res = d1.strftime(db_date_format)
+                res_dict['news_published_date'] = date_res
+            except Exception as e2:
+                print(e2)
+                content_parser.logger.info('Epoch date error {}'.format(e2))
+    article_body_tag = soup.find('div', attrs = {'id':'article_body'})
+    content_temp, links, links_descs = [], [], []
+    if article_body_tag:
+        p_tags = article_body_tag.find_all('p', attrs = {'class': None})
+        a_tags = article_body_tag.find_all('a')
+        if p_tags:
+            for p in p_tags:
+                if p.get_text().strip():
+                    content_temp.append(p.get_text().strip())
+        if len(a_tags):
+            for a in a_tags:
+                if len(a):
+                    if a['href'] == '#':
+                        continue
+                    if a.get_text().strip() and 'www' in a['href']:
+                        links.append(a['href'])
+                        links_descs.append(a.get_text().strip())
+            res_dict['news_related_url'] = links
+            res_dict['news_related_url_desc'] = links_descs
+                
+    content = '\n'.join(content_temp).strip()
+    if content:
+        res_dict['news'] = content
+
+    if not res_dict or 'content' not in res_dict:
+        content_parser.logger.error('Epoch url: {} did not process properly'.format(url))
+
+    return res_dict
