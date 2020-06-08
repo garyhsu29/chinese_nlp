@@ -14,8 +14,9 @@ FORMAT = '%(asctime)s %(levelname)s: %(message)s'
 logging.basicConfig(level=logging.INFO, filename=os.path.join(DIR_PATH, 'sent_splitter.log'), filemode='a', format=FORMAT)
 raw_df = query_from_db("SELECT news_id, news FROM news_contents WHERE processed_status = 0 LIMIT 100;")
 
-with open('server2server.config', 'rb') as f:
+with open(os.path.join(DIR_PATH,'server2server.config'), 'rb') as f:
     configs = pickle.load(f)
+
 
 mydb = mysql.connector.connect(
     host = configs['host'],
