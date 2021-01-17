@@ -8,13 +8,13 @@ from bs4 import BeautifulSoup
 import time
 import pickle
 
-with open('loc2server.config', 'rb') as f:
-    configs = pickle.load(f)
+#with open('loc2server.config', 'rb') as f:
+#    configs = pickle.load(f)
 
 DIR_PATH = os.path.dirname(os.path.realpath(__file__))
 
-#with open(os.path.join(DIR_PATH,'server2server.config'), 'rb') as f:
-#    configs = pickle.load(f)
+with open(os.path.join(DIR_PATH,'server2server.config'), 'rb') as f:
+    configs = pickle.load(f)
 
 mydb = mysql.connector.connect(
   host = configs['host'],
@@ -160,7 +160,8 @@ class RssParser(object):
                 r = requests.get(url, headers = self.headers)
                 web_content = r.text
                 rss_source_category = re.search(r'(\<title\>)(.+?)(\<\/title\>)', web_content).group(2)
-                rss_source, rss_category = rss_source_category.split('-')
+                rss_source_category = re.search(self.CDATA_BLOCK, rss_source_category).group(1)
+                rss_category, rss_source = rss_source_category.split('-')
                 rss_source = rss_source.strip()
                 rss_category = rss_category.strip()
                 for index, match in enumerate(re.finditer(r'(\<link\>)(.+?)(\<\/link\>)', web_content)):
