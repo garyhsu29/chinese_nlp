@@ -7,14 +7,14 @@ import mysql.connector
 from bs4 import BeautifulSoup
 import time
 import pickle
-"""
+
 with open('loc2server.config', 'rb') as f:
     configs = pickle.load(f)
-"""
+
 DIR_PATH = os.path.dirname(os.path.realpath(__file__))
 
-with open(os.path.join(DIR_PATH,'server2server.config'), 'rb') as f:
-    configs = pickle.load(f)
+#with open(os.path.join(DIR_PATH,'server2server.config'), 'rb') as f:
+#    configs = pickle.load(f)
 
 mydb = mysql.connector.connect(
   host = configs['host'],
@@ -39,7 +39,14 @@ class RssParser(object):
         
         # ------- Multiple urls rss source ------- #
         self.headers = {'user-agent': 'Mozilla/5.0 (Macintosh Intel Mac OS X 10_13_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.181 Safari/537.36',  'Connection': 'close'}
-        self.yahoo_rss_url = ['https://tw.stock.yahoo.com/rss/url/d/e/N{}.html'.format(i + 1) for i in range(20)] + ['https://tw.stock.yahoo.com/rss/url/d/e/R{}.html'.format(i + 1) for i in range(6)]
+        self.yahoo_rss_urls_t1 = ['https://tw.news.yahoo.com/rss/{}'.format(category) for category in ('politics', 'society', 'technology', 'finance', 'sports', 'health')]
+        self.yahoo_news_url_dict = {'最新股市': 'https://tw.stock.yahoo.com/rss?category=news', 
+                       '台股動態': 'https://tw.stock.yahoo.com/rss?category=tw-market',
+                       '國際財經': 'https://tw.stock.yahoo.com/rss?category=intl-markets',
+                       '小資理財': 'https://tw.stock.yahoo.com/rss?category=personal-finance',
+                       '基金動態': 'https://tw.stock.yahoo.com/rss?category=funds-news',
+                       '專家專欄': 'https://tw.stock.yahoo.com/rss?category=column',
+                       '研究報導':'https://tw.stock.yahoo.com/rss?category=research'}
         self.ltn_rss_url = ['https://news.ltn.com.tw/rss/{}.xml'.format(category) for category in ['politics', 'society', 'business', 'sports', 'life', 'entertainment', 'opinion', 'world', 'local', 'people', 'novelty', 'all']]
         self.tpn_rss_url = ['https://www.peoplenews.tw/rss/{}'.format(category) for category in ['政治', '財經', '社會', '生活', '文化', '地方', '全球', '台語世界', '特企', '民報觀點','專欄', '專文', '人物', '論壇', '公民', '書摘', '熱門新聞', '總覽','即時']]
         self.newstalk_rss_url =['https://newtalk.tw/rss/category/{}'.format(category) for category in [1, 2, 3, 7, 4, 9, 14, 17, 8, 5, 11, 102, 18, 103, 16, 15, 6]]
@@ -69,7 +76,7 @@ class RssParser(object):
                                      'PCHOME - 公共':'https://news.pchome.com.tw/rss/016',
                                      'PCHOME - 汽車':'https://news.pchome.com.tw/rss/018'}
         self.cna_rss_urls = ['http://feeds.feedburner.com/rsscna/{}?format=xml'.format(category) for category in ['politics', 'finance', 'mainland', 'lifehealth', 'sport', 'health', 'intworld', 'culture', 'social', 'technology', 'stars', 'local']]
-        self.cts_rss_urls = ['https://news.cts.com.tw/rss/{}.xml'.format(category) for category in ['hots', 'sports', 'politics', 'society', 'money', 'entertain', 'goodlife', 'general', 'international', 'program', 'life', 'exclusive']]
+        #self.cts_rss_urls = ['https://news.cts.com.tw/rss/{}.xml'.format(category) for category in ['hots', 'sports', 'politics', 'society', 'money', 'entertain', 'goodlife', 'general', 'international', 'program', 'life', 'exclusive']]
         self.ttv_rss_urls = ['https://www.ttv.com.tw/rss/RSSHandler.ashx?d=news{}'.format(category) for category in ['', '&t=E', '&t=L', '&t=A','&t=F', '&t=P', '&t=B', '&t=G', '&t=C', '&t=H', '&t=D', '&t=J']]
         self.bw_urls = ['http://cmsapi.businessweekly.com.tw/?CategoryId=efd99109-9e15-422e-97f0-078b21322450&TemplateId=8E19CF43-50E5-4093-B72D-70A912962D55', 'http://cmsapi.businessweekly.com.tw/?CategoryId=6f061304-ba38-4de9-9960-4e74420e71a0&TemplateId=8E19CF43-50E5-4093-B72D-70A912962D55', 'http://cmsapi.businessweekly.com.tw/?CategoryId=fd8d6ee6-df7c-4d2b-a635-7a6e433c9bd1&TemplateId=8E19CF43-50E5-4093-B72D-70A912962D55', 'http://cmsapi.businessweekly.com.tw/?CategoryId=24612ec9-2ac5-4e1f-ab04-310879f89b33&TemplateId=8E19CF43-50E5-4093-B72D-70A912962D55', 'http://cmsapi.businessweekly.com.tw/?CategoryId=ad004924-65aa-42af-af2f-487bf4e3c185&TemplateId=8e19cf43-50e5-4093-b72d-70a913062d55', 'https://www.businessweekly.com.tw/Event/feedsec.aspx?feedid=10&channelid=15', 'https://www.businessweekly.com.tw/Event/feedsec.aspx?feedid=1&channelid=4', 'https://www.businessweekly.com.tw/Event/feedsec.aspx?feedid=2&channelid=4', 'https://www.businessweekly.com.tw/Event/feedsec.aspx?feedid=5&channelid=4']
         self.epoch_urls = {'北美新聞': 'https://www.epochtimes.com/b5/nsc412.xml',
@@ -148,7 +155,7 @@ class RssParser(object):
         self.bo_rss_url = 'https://buzzorange.com/feed/'
         self.tnl_rss_url = 'https://feeds.feedburner.com/TheNewsLens'
     def yahoo_rss_parser(self):
-        for url in self.yahoo_rss_url:
+        for url in self.yahoo_rss_urls_t1:
             try:
                 r = requests.get(url, headers = self.headers)
                 web_content = r.text
@@ -161,10 +168,19 @@ class RssParser(object):
                         continue
                     self.rss_source_category_dict[rss_source][rss_category].append(match.group(2))
             except Exception as e:
-                logging.error("Yahoo rss parser: {}".format(e))
-                
-            
-                
+                logging.error("Yahoo rss parser (1): {}".format(e))
+        for rss_category, url in self.yahoo_news_url_dict.items():
+            try:
+                r = requests.get(url, headers = self.headers)
+                web_content = r.text
+                rss_source = re.search(r'(\<title\>)(.+?)(\<\/title\>)', web_content).group(2)
+                for index, match in enumerate(re.finditer(r'(\<link\>)(.+?)(\<\/link\>)', web_content)):
+                    if index < 2:
+                        continue
+                    self.rss_source_category_dict[rss_source][rss_category].append(match.group(2))
+            except Exception as e:
+                logging.error("Yahoo rss parser (2): {}".format(e))
+
     def ltn_rss_parser(self):     
         for url in self.ltn_rss_url:
             try:
@@ -625,7 +641,7 @@ rss_parser.storm_rss_parser()
 rss_parser.sina_rss_parser()
 rss_parser.pchome_rss_parser()
 rss_parser.cna_rss_parser()
-rss_parser.cts_rss_parser()
+#rss_parser.cts_rss_parser()
 rss_parser.ttv_rss_parser()
 rss_parser.bw_rss_parser()
 rss_parser.epoch_rss_parser()
