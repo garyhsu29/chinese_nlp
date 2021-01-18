@@ -167,7 +167,7 @@ class RssParser(object):
                 for index, match in enumerate(re.finditer(r'(\<link\>)(.+?)(\<\/link\>)', web_content)):
                     if index < 2:
                         continue
-                    self.rss_source_category_dict[rss_source][rss_category].append(match.group(2))
+                    self.rss_source_category_dict[rss_source][rss_category].append((match.group(2), 'Yahoo Source 1'))
             except Exception as e:
                 logging.error("Yahoo rss parser (1): {}".format(e))
         for rss_category, url in self.yahoo_news_url_dict.items():
@@ -178,7 +178,7 @@ class RssParser(object):
                 for index, match in enumerate(re.finditer(r'(\<link\>)(.+?)(\<\/link\>)', web_content)):
                     if index < 2:
                         continue
-                    self.rss_source_category_dict[rss_source][rss_category].append(match.group(2))
+                    self.rss_source_category_dict[rss_source][rss_category].append((match.group(2), 'Yahoo Source 2'))
             except Exception as e:
                 logging.error("Yahoo rss parser (2): {}".format(e))
 
@@ -194,7 +194,7 @@ class RssParser(object):
                 for index, match in enumerate(re.finditer(r'(\<link\>)(.+?)(\<\/link\>)', web_content)):
                     if index < 1:
                         continue
-                    self.rss_source_category_dict[rss_source][rss_category].append(match.group(2))
+                    self.rss_source_category_dict[rss_source][rss_category].append((match.group(2), 'LTN'))
             except Exception as e:
                 logging.error("LTN rss parser: {}".format(e))
                 logging.error('Error Url: {}'.format(url))
@@ -211,7 +211,7 @@ class RssParser(object):
                 for index, match in enumerate(re.finditer(r'(\<link\>)(.+?)(\<\/link\>)', web_content)):
                     if index < 1:
                         continue
-                    self.rss_source_category_dict[rss_source][rss_category].append(match.group(2))
+                    self.rss_source_category_dict[rss_source][rss_category].append((match.group(2), 'TPN'))
             except Exception as e:
                 logging.error("TPN rss parser: {}".format(e))
                 logging.error('Error Url: {}'.format(url))
@@ -228,7 +228,7 @@ class RssParser(object):
                 for index, match in enumerate(re.finditer(r'(\<link\>)(.+?)(\<\/link\>)', web_content)):
                     if index < 1:
                         continue
-                    self.rss_source_category_dict[rss_source][rss_category].append(match.group(2))
+                    self.rss_source_category_dict[rss_source][rss_category].append((match.group(2), 'NewsTalk'))
             except Exception as e:
                 logging.error("NewsTalk rss parser: {}".format(e))
                 logging.error('Error Url: {}'.format(url))
@@ -244,7 +244,7 @@ class RssParser(object):
                 for index, match in enumerate(re.finditer(r'(\<link\>)(.+?)(<\/link\>)', web_content)):
                     if index < 1:
                         continue
-                    self.rss_source_category_dict[rss_source][rss_category].append(match.group(2))
+                    self.rss_source_category_dict[rss_source][rss_category].append((match.group(2), 'ETToday'))
             except Exception as e:
                 logging.error("Ettoday rss parser: {}".format(e))
                 logging.error('Error Url: {}'.format(url))
@@ -262,7 +262,7 @@ class RssParser(object):
                 for index, match in enumerate(re.finditer(r'(\<link\>)(.+?)(<\/link\>)', web_content)):
                     if index < 1:
                         continue
-                    self.rss_source_category_dict[rss_source][rss_category].append(match.group(2))
+                    self.rss_source_category_dict[rss_source][rss_category].append((match.group(2), 'UDN'))
             except Exception as e:
                 logging.error("udn rss parser: {}".format(e))
                 logging.error('Error Url: {}'.format(url))
@@ -279,7 +279,7 @@ class RssParser(object):
                 for index, match in enumerate(re.finditer(r'(\<link\>)(.+?)(<\/link\>)', web_content)):
                     if index < 1:
                         continue
-                    self.rss_source_category_dict[rss_source][rss_category].append(match.group(2))
+                    self.rss_source_category_dict[rss_source][rss_category].append((match.group(2), 'UpMedia'))
             except Exception as e:
                 logging.error("upmedia rss parser: {}".format(e))
                 logging.error('Error Url: {}'.format(url))
@@ -297,7 +297,7 @@ class RssParser(object):
                 for index, match in enumerate(re.finditer(r'(\<link\>)(.+?)(<\/link\>)', web_content)):
                     if index < 1:
                         continue
-                    self.rss_source_category_dict[rss_source][rss_category].append(match.group(2))
+                    self.rss_source_category_dict[rss_source][rss_category].append((match.group(2), 'Storm'))
             except Exception as e:
                 logging.error("storm rss parser: {}".format(e))
                 logging.error('Error Url: {}'.format(url))
@@ -314,7 +314,7 @@ class RssParser(object):
                 for index, match in enumerate(re.finditer(r'(\<link\>)(.+?)(\<\/link\>)', web_content)):
                     if index < 1:
                         continue
-                    self.rss_source_category_dict[rss_source][rss_category].append(match.group(2))
+                    self.rss_source_category_dict[rss_source][rss_category].append((match.group(2), 'SINA'))
             except Exception as e:
                 logging.error("sina rss parser: {}".format(e))
                 logging.error('Error Url: {}'.format(url))
@@ -330,7 +330,7 @@ class RssParser(object):
                 for index, match in enumerate(re.finditer(r'(\<link\>){}(<\/link\>)'.format(self.CDATA_BLOCK), web_content)):
                     if index < 1:
                         continue
-                    self.rss_source_category_dict[rss_source][rss_category].append(match.group(2))
+                    self.rss_source_category_dict[rss_source][rss_category].append((match.group(2), 'PCHOME'))
             except Exception as e:
                 logging.error("pchome rss parser: {}".format(e))
                 logging.error('Error Url: {}'.format(url))
@@ -346,7 +346,7 @@ class RssParser(object):
                 for index, match in enumerate(re.finditer(r'(\<link\>)(.+?)(<\/link\>)', web_content)):
                     if index < 2:
                         continue
-                    self.rss_source_category_dict[rss_source][rss_category].append(match.group(2))
+                    self.rss_source_category_dict[rss_source][rss_category].append((match.group(2), 'CNA'))
             except Exception as e:
                 logging.error("cna rss parser: {}".format(e))
                 logging.error('Error Url: {}'.format(url))
@@ -362,7 +362,7 @@ class RssParser(object):
                 for index, match in enumerate(re.finditer(r'(\<link\>)(.+?)(<\/link\>)', web_content)):
                     if index < 1:
                         continue
-                    self.rss_source_category_dict[rss_source][rss_category].append(match.group(2))
+                    self.rss_source_category_dict[rss_source][rss_category].append((match.group(2), 'CTS'))
             except Exception as e:
                 logging.error("cts rss parser: {}".format(e))
                 logging.error('Error Url: {}'.format(url))
@@ -384,7 +384,7 @@ class RssParser(object):
                 for index, match in enumerate(re.finditer(r'(\<link\>)(.+?)(\<\/link\>)', web_content)):
                     if index < 2:
                         continue
-                    self.rss_source_category_dict[rss_source][rss_category].append(match.group(2))
+                    self.rss_source_category_dict[rss_source][rss_category].append((match.group(2), 'TTV'))
             except Exception as e:
                 logging.error("ttv rss parser: {}".format(e))
                 logging.error('Error Url: {}'.format(url))
@@ -408,7 +408,7 @@ class RssParser(object):
                 for index, match in enumerate(re.finditer(r'(\<link\>)(.+?)(\<\/link\>)', web_content)):
                     if index < 2:
                         continue
-                    self.rss_source_category_dict[rss_source][rss_category].append(match.group(2))
+                    self.rss_source_category_dict[rss_source][rss_category].append((match.group(2), 'BW'))
             except Exception as e:
                 logging.error("bw rss parser: {}".format(e))
                 logging.error('Error Url: {}'.format(url))
@@ -423,7 +423,7 @@ class RssParser(object):
                 for index, match in enumerate(re.finditer(r'(\<link\>)(.+?)(\<\/link\>)', web_content)):
                     if index < 2:
                         continue
-                    self.rss_source_category_dict[rss_source][rss_category].append(match.group(2))
+                    self.rss_source_category_dict[rss_source][rss_category].append((match.group(2), 'EPOCH'))
             except Exception as e:
                 logging.error("epoch rss parser: {}".format(e))
                 logging.error('Error Url: {}'.format(url))
@@ -440,7 +440,7 @@ class RssParser(object):
                 for index, match in enumerate(re.finditer(r'(\<link\>)(.+?)(\<\/link\>)', web_content)):
                     if index < 2:
                         continue
-                    self.rss_source_category_dict[rss_source][rss_category].append(match.group(2))
+                    self.rss_source_category_dict[rss_source][rss_category].append((match.group(2), 'CW'))
 
             except Exception as e:
                 logging.error("epoch rss parser: {}".format(e))
@@ -455,7 +455,7 @@ class RssParser(object):
             for index, match in enumerate(re.finditer(r'(\<link\>)(.+?)(\<\/link\>)', web_content)):
                 if index < 2:
                     continue
-                self.rss_source_dict[rss_source].append(match.group(2))
+                self.rss_source_dict[rss_source].append((match.group(2), 'MSN'))
                 
         except Exception as e:
             logging.error("MSN rss parser: {}".format(e))
@@ -468,7 +468,7 @@ class RssParser(object):
             for index, match in enumerate(re.finditer(r'(\<link\>)(.+?)(\<\/link\>)', web_content)):
                 if index < 1:
                     continue
-                self.rss_source_dict[rss_source].append(match.group(2))
+                self.rss_source_dict[rss_source].append((match.group(2), 'PTS'))
                 
         except Exception as e:
             logging.error("pts rss parser: {}".format(e))
@@ -481,7 +481,7 @@ class RssParser(object):
             for index, match in enumerate(re.finditer(r'(\<link\>)(.+?)(\<\/link\>)', web_content)):
                 if index < 1:
                     continue
-                self.rss_source_dict[rss_source].append(match.group(2))
+                self.rss_source_dict[rss_source].append((match.group(2), 'NewsMarket'))
         except Exception as e:
             logging.error("nesmarket rss parser: {}".format(e))
             
@@ -493,7 +493,7 @@ class RssParser(object):
             for index, match in enumerate(re.finditer(r'(\<link\>)(.+?)(\<\/link\>)', web_content)):
                 if index < 2:
                     continue
-                self.rss_source_dict[rss_source].append(match.group(2))
+                self.rss_source_dict[rss_source].append((match.group(2), 'TWRepoeter'))
         except Exception as e:
             logging.error("twreporter rss parser: {}".format(e))
     
@@ -505,7 +505,7 @@ class RssParser(object):
             for index, match in enumerate(re.finditer(r'(\<link\>)(.+?)(\<\/link\>)', web_content)):
                 if index < 1:
                     continue
-                self.rss_source_dict[rss_source].append(match.group(2))
+                self.rss_source_dict[rss_source].append((match.group(2), 'CoolLoud'))
         except Exception as e:
             logging.error("coolloud rss parser: {}".format(e))
     
@@ -517,7 +517,7 @@ class RssParser(object):
             for index, match in enumerate(re.finditer(r'(\<link\>)(.+?)(\<\/link\>)', web_content)):
                 if index < 1:
                     continue
-                self.rss_source_dict[rss_source].append(match.group(2))
+                self.rss_source_dict[rss_source].append((match.group(2), 'Peopo'))
         except Exception as e:
             logging.error("peopo rss parser: {}".format(e))
             
@@ -529,7 +529,7 @@ class RssParser(object):
             for index, match in enumerate(re.finditer(r'(\<link\>)(.+?)(\<\/link\>)', web_content)):
                 if index < 1:
                     continue
-                self.rss_source_dict[rss_source].append(match.group(2))
+                self.rss_source_dict[rss_source].append((match.group(2), 'CMMedia'))
         except Exception as e:
             logging.error("cmmedia rss parser: {}".format(e))
     
@@ -541,7 +541,7 @@ class RssParser(object):
             for index, match in enumerate(re.finditer(r'(\<link\>)(.+?)(\<\/link\>)', web_content)):
                 if index < 2:
                     continue
-                self.rss_source_dict[rss_source].append(match.group(2))
+                self.rss_source_dict[rss_source].append((match.group(2), 'RTI'))
         except Exception as e:
             logging.error("rti rss parser: {}".format(e))
     
@@ -553,7 +553,7 @@ class RssParser(object):
             for index, match in enumerate(re.finditer(r'(\<link\>)(.+?)(\<\/link\>)', web_content)):
                 if index < 1:
                     continue
-                self.rss_source_dict[rss_source].append(match.group(2))
+                self.rss_source_dict[rss_source].append((match.group(2), 'BO'))
         except Exception as e:
             logging.error("bo rss parser: {}".format(e))
             
@@ -565,7 +565,7 @@ class RssParser(object):
             for index, match in enumerate(re.finditer(r'(\<link\>)(.+?)(\<\/link\>)', web_content)):
                 if index < 2:
                     continue
-                self.rss_source_dict[rss_source].append(match.group(2))
+                self.rss_source_dict[rss_source].append((match.group(2), 'TNL'))
         except Exception as e:
             logging.error("rti rss parser: {}".format(e))
     
@@ -586,13 +586,13 @@ class RssParser(object):
         return udn_rss_url_dict
     
     def rss_insert(self):
-        for rss_source in self.rss_source_category_dict.keys():
-            for rss_category in self.rss_source_category_dict[rss_source].keys():
-                for url in self.rss_source_category_dict[rss_source][rss_category]:
+        for news_source in self.rss_source_category_dict.keys():
+            for news_category in self.rss_source_category_dict[news_source].keys():
+                for url, rss_source in self.rss_source_category_dict[news_source][news_category]:
                     mycursor = mydb.cursor()
                     try:
-                        sql = "INSERT INTO `news_db`.news_rss_feeds (news_url, news_source, news_category) VALUES (%s, %s, %s)"
-                        val = (str(url), str(rss_source), str(rss_category))
+                        sql = "INSERT INTO `news_db`.news_rss_feeds (news_url, news_source, news_category, rss_source) VALUES (%s, %s, %s, %s)"
+                        val = (str(url), str(news_source), str(news_category), str(rss_source))
                         mycursor.execute(sql, val)
                     except Exception as e:
                         # duplicated news_url, news_source, news_category
@@ -605,12 +605,12 @@ class RssParser(object):
                         mydb.commit()
                     mycursor.close()
         
-        for rss_source, source_url_lst in self.rss_source_dict.items():
-            for url in source_url_lst:
+        for news_source, source_url_lst in self.rss_source_dict.items():
+            for url, rss_source in source_url_lst:
                 mycursor = mydb.cursor()
                 try:
-                    sql = "INSERT INTO `news_db`.news_rss_feeds (news_url, news_source) VALUES (%s, %s)"
-                    val = (str(url), str(rss_source))
+                    sql = "INSERT INTO `news_db`.news_rss_feeds (news_url, news_source, rss_source) VALUES (%s, %s, %s)"
+                    val = (str(url), str(news_source), str(rss_source))
                     mycursor.execute(sql, val)
                 except Exception as e:
                   # duplicated news_url, news_source
