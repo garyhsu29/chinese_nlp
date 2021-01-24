@@ -57,6 +57,7 @@ def ltn_content_processor(url):
 
     time_tag_1 = soup.find('meta', attrs = {'property': 'article:published_time'})
     time_tag_2 = soup.find('meta', attrs = {'name': 'pubdate'})
+    #time_tag_3 = soup.find('span', attrs = {'class': 'time'})
     if time_tag_1:
         try:
             d1 = datetime.datetime.strptime(time_tag_1.get('content'), "%Y-%m-%dT%H:%M:%S+08:00") 
@@ -72,7 +73,8 @@ def ltn_content_processor(url):
                 date_res = d1.strftime(db_date_format)
                 res_dict['news_published_date'] = date_res
             except Exception as e2:
-                content_parser.logger.info('LTN date error {}, URL: {}'.format(e2, url))
+                print('LTN date error {}, URL: {}'.format(e2, url))
+                #content_parser.logger.info('LTN date error {}, URL: {}'.format(e2, url))
 
     elif time_tag_2:
         try:
@@ -89,10 +91,12 @@ def ltn_content_processor(url):
                 date_res = d1.strftime(db_date_format)
                 res_dict['news_published_date'] = date_res
             except Exception as e2:
-                content_parser.logger.info('LTN date error: {}, URL:{}'.format(e2, url))
+                print('LTN date error {}, URL: {}'.format(e2, url))
+                #content_parser.logger.info('LTN date error: {}, URL:{}'.format(e2, url))
 
     article_body_tag = soup.find('div', attrs = {'itemprop':'articleBody'})
     article_body_tag2 = soup.find('div', attrs = {'class':'text boxTitle boxText'})
+    article_body_tag3 = soup.find('div', attrs = {'class':'text'})
     temp_content = []
     links = []
     links_descs = []
@@ -112,7 +116,7 @@ def ltn_content_processor(url):
         if len(a_tags):
             for a in a_tags:
                 if len(a):
-                    if a['href'] == '#':
+                    if a.get('href', '')  == '#':
                         continue
                     if a.get_text().strip() and 'www' in a['href']:
                         links.append(a['href'])
@@ -135,7 +139,30 @@ def ltn_content_processor(url):
         if len(a_tags):
             for a in a_tags:
                 if len(a):
-                    if a['href'] == '#':
+                    if a.get('href', '') == '#':
+                        continue
+                    if a.get_text().strip() and 'www' in a['href']:
+                        links.append(a['href'])
+                        links_descs.append(a.get_text().strip())
+            res_dict['news_related_url'] = links
+            res_dict['news_related_url_desc'] = links_descs
+    elif article_body_tag3:
+        p_tags = article_body_tag3.find_all('p', attrs = {'class': None})
+        a_tags = article_body_tag3.find_all('a')
+        if p_tags:
+            temp = []
+            for p in p_tags:
+                if p.find('span'):
+                    p.span.decompose()
+                if p.text:
+                    if p.text.strip() not in postfix :
+                        temp_content.append(p.text.strip())
+                    else:
+                        break
+        if len(a_tags):
+            for a in a_tags:
+                if len(a):
+                    if a.get('href', '') == '#':
                         continue
                     if a.get_text().strip() and 'www' in a['href']:
                         links.append(a['href'])
@@ -148,6 +175,7 @@ def ltn_content_processor(url):
         res_dict['news'] = content
 
     if not res_dict or 'news' not in res_dict:
+        #print('LTN {}, did not process properly'.format(url))
         content_parser.logger.error('LTN url: {} did not process properly'.format(url))
         return
     return res_dict
