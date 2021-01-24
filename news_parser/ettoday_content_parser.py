@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup
 import datetime
 import time
 from content_parser import ContentParser
-
+import html
 start = time.time()
 requests.adapters.DEFAULT_RETRIES = 5 
 
@@ -73,8 +73,8 @@ def ettoday_content_processor(url):
                 # Ignore the image caption
                 if p.find('strong'):
                     continue
-                if p.text:
-                    temp_content.append(p.text.strip())
+                if p.text and p.text[0] != '▲':
+                    temp_content.append(html.unescape(p.text.strip()))
         if len(a_tags):
             for a in a_tags:
                 if len(a):
@@ -93,6 +93,7 @@ def ettoday_content_processor(url):
     if not res_dict or 'news' not in res_dict:
         content_parser.logger.error('Ettoday url: {} did not process properly'.format(url))
         return
+
     return res_dict
 
 content_parser = ContentParser('ETtoday')
