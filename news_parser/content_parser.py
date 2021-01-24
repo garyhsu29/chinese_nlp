@@ -10,7 +10,7 @@ start = time.time()
 
 DIR_PATH = dirname(abspath(__file__))
 parent_path = dirname(dirname(abspath(__file__)))
-with open(os.path.join(parent_path, 'configs', 'loc2server.config'), 'rb') as f:
+with open(os.path.join(parent_path, 'configs', 'server2server.config'), 'rb') as f:
     configs = pickle.load(f)
 #logging.basicConfig(level=logging.INFO, filename=os.path.join(DIR_PATH, 'content_parser.log'), filemode='a', format=FORMAT)
 
