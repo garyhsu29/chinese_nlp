@@ -6,11 +6,13 @@ from bs4 import BeautifulSoup
 import datetime
 import time
 from content_parser import ContentParser
+import html
 
 start = time.time()
 requests.adapters.DEFAULT_RETRIES = 5 
 
 import re
+
 def pchome_content_processor(url):
     res_dict = {}
     r = requests.get(url, headers = content_parser.headers)
@@ -70,17 +72,15 @@ def pchome_content_processor(url):
         content = article_body_tag.text.strip()
         a_tags = article_body_tag.find_all('a')
         if content:
-            content = re.sub('(\n)+', '\n', content)
+            content = re.sub('(\n)+', '\n', html.unescape(content))
             content = re.sub(r'(相關新聞[\s\S]+)', '', content)
             res_dict['news'] = content 
             
     if not res_dict or 'news' not in res_dict:
         content_parser.logger.error('PChome url: {} did not process properly'.format(url))
         return
-
+        
     return res_dict
-
-
 content_parser = ContentParser('PCHOME')
 # Query the data with source name
 unprocessed_data = content_parser.content_query()
