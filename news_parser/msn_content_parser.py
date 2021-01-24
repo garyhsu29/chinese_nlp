@@ -12,6 +12,7 @@ start = time.time()
 requests.adapters.DEFAULT_RETRIES = 5 
 
 
+
 def msn_content_processor(url):
     res_dict = {}
     prefix = ['相關報導', '※', '＊', '更多三立新聞網報導', '延伸閱讀', '資料來源', '更多中時電子報精彩報導', '看了這篇文章的人，也']
@@ -109,9 +110,9 @@ def msn_content_processor(url):
 
     if not res_dict or 'news' not in res_dict: 
         content_parser.logger.error('MSN url: {} did not process properly'.format(url))
+        #print('MSN url: {} did not process properly'.format(url))
         return 
     return res_dict
-
 content_parser = ContentParser('MSN')
 # Query the data with source name
 unprocessed_data = content_parser.content_query()

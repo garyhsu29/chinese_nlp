@@ -94,6 +94,7 @@ def yahoo_content_processor(url):
         res_dict['news'] = content
         return res_dict
     else:
+        content_parser_1.logger.error('Yahoo url: {} did not process properly'.format(url))
         return
 
 
