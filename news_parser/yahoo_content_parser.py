@@ -6,14 +6,14 @@ from bs4 import BeautifulSoup
 import datetime
 import time
 from content_parser import ContentParser
+import html
+import random
 
-start = time.time()
 requests.adapters.DEFAULT_RETRIES = 5 
 
 def yahoo_content_processor(url):
     res_dict = {}
-
-    r = requests.get(url, headers = content_parser.headers)
+    r = requests.get(url, headers = content_parser_1.headers)
     web_content = r.text
     soup = BeautifulSoup(web_content, "lxml")
     for br in soup.find_all("br"):
@@ -27,7 +27,6 @@ def yahoo_content_processor(url):
     fb_app_tag = soup.find('meta', attrs = {'property':'fb:app_id'})
     if fb_app_tag:
         res_dict['news_fb_app_id'] = str(fb_app_tag['content'])
-
     fb_page_tag = soup.find('meta', attrs = {'property':'fb:pages'})
     if fb_page_tag:
         res_dict['news_fb_page'] = str(fb_page_tag['content'])
@@ -54,6 +53,7 @@ def yahoo_content_processor(url):
             pass
 
     article_body_tag = soup.find('article', attrs = {'itemprop':'articleBody'})
+    caas_body_tag = soup.find('div', attrs = {'class': 'caas-body'})
     temp_content = []
     links = []
     links_descs = []
@@ -71,30 +71,64 @@ def yahoo_content_processor(url):
                     links_descs.append(a.get_text().strip())
             res_dict['news_related_url'] = links
             res_dict['news_related_url_desc'] = links_descs
-
-    if not temp_content:
-        content_parser.logger.error('Yahoo url: {} did not process properly'.format(url))
-        return
-    else:    
+    elif caas_body_tag:
+        p_tags = caas_body_tag.find_all('p')
+        a_tags = caas_body_tag.find_all('a')
+        if p_tags:
+            for index, p in enumerate(p_tags):
+                temp_content.append(html.unescape(p.get_text()).strip())
+        if a_tags:
+            for a in a_tags:
+                if a.get_text().strip():
+                    links.append(a['href'])
+                    links_descs.append(a.get_text().strip())
+            res_dict['news_related_url'] = links
+            res_dict['news_related_url_desc'] = links_descs
+    if temp_content:    
         # Capture the description start with 公告 to content
         if title_category[0][:4] == '【公告】':
             prefix = title_category[0]
         else:
             prefix = ''
-        content = prefix + ' '.join(temp_content).replace('。 ', '。\n')
+        content = prefix + '\n'.join(temp_content)#.replace('。 ', '。\n')
         res_dict['news'] = content
         return res_dict
+    else:
+        return
 
 
 
 
-content_parser = ContentParser('Yahoo!奇摩股市')
-# Query the data with source name
-unprocessed_data = content_parser.content_query()
+start = time.time()
+content_parser_1 = ContentParser('Yahoo Source 1')
+unprocessed_data_1 = content_parser_1.content_query()
+content_parser_1.content_processor(unprocessed_data_1, yahoo_content_processor)
 
-content_parser.content_processor(unprocessed_data, yahoo_content_processor)
-content_parser.encoding_cursor.close()
-content_parser.mydb.close()
+content_parser_1.encoding_cursor.close()
+content_parser_1.mydb.close()
+content_parser_1.logger.info("Processed Yahoo Source 1 {} examples in {} seconds".format(len(unprocessed_data_1), time.time() - start))
 
-content_parser.logger.info("Processed Yahoo {} examples in {} seconds".format(len(unprocessed_data), time.time() - start))
+
+start = time.time()
+content_parser_2 = ContentParser('Yahoo奇摩新聞')
+unprocessed_data_2 = content_parser_2.content_query()
+content_parser_2.content_processor(unprocessed_data_2, yahoo_content_processor)
+
+content_parser_2.encoding_cursor.close()
+content_parser_2.mydb.close()
+content_parser_2.logger.info("Processed Yahoo News {} examples in {} seconds".format(len(unprocessed_data_2), time.time() - start))
+
+
+start = time.time()
+content_parser_3 = ContentParser('Yahoo奇摩股市')
+unprocessed_data_3 = content_parser_3.content_query()
+content_parser_3.content_processor(unprocessed_data_3, yahoo_content_processor)
+
+content_parser_3.encoding_cursor.close()
+content_parser_3.mydb.close()
+content_parser_3.logger.info("Processed Yahoo Stock {} examples in {} seconds".format(len(unprocessed_data_3), time.time() - start))
+
+
+
+
 
