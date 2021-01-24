@@ -6,6 +6,7 @@ from bs4 import BeautifulSoup
 import datetime
 import time
 from content_parser import ContentParser
+import html
 
 start = time.time()
 
@@ -68,6 +69,7 @@ def epoch_content_processor(url):
                 content_parser.logger.info('Epoch date error {}'.format(e2))
 
     article_body_tag = soup.find('div', attrs = {'itemprop':'articleBody'})
+    article_body_tag_2 = soup.find('div', attrs = {'class':'art-content'})
     #print(article_body_tag)
     temp_content = []
     links = []
@@ -80,7 +82,27 @@ def epoch_content_processor(url):
             for p in p_tags:
                 if p.find('script', attrs = {'type': 'text/javascript'}):
                     continue
-                temp_content.append(p.get_text().strip())
+                temp_content.append(html.unescape(p.get_text().strip()))
+                
+        if len(a_tags):
+            for a in a_tags:
+                if len(a):
+                    if a['href'] == '#':
+                        continue
+                    if a.get_text().strip() and 'www' in a['href']:
+                        links.append(a['href'])
+                        links_descs.append(a.get_text().strip())
+            res_dict['news_related_url'] = links
+            res_dict['news_related_url_desc'] = links_descs
+    elif article_body_tag_2:
+        p_tags = article_body_tag_2.find_all('p', attrs = {'class': None})
+        a_tags = article_body_tag_2.find_all('a')
+        if p_tags:
+            
+            for p in p_tags:
+                if p.find('script', attrs = {'type': 'text/javascript'}):
+                    continue
+                temp_content.append(html.unescape(p.get_text().strip()))
                 
         if len(a_tags):
             for a in a_tags:
@@ -97,9 +119,11 @@ def epoch_content_processor(url):
         res_dict['news'] = content
 
     if not res_dict or 'news' not in res_dict:
-        content_parser.logger.error('Epoch url: {} did not process properly'.format(url))
         return
+        content_parser.logger.error('Epoch url: {} did not process properly'.format(url))
+
     return res_dict
+
 
 
 
