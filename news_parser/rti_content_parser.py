@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup
 import datetime
 import time
 from content_parser import ContentParser
-
+import html
 start = time.time()
 
 requests.adapters.DEFAULT_RETRIES = 5 
@@ -47,20 +47,21 @@ def rti_content_processor(url):
     time_tag = soup.find('li', attrs = {'class': 'date'})
     if time_tag:
         try:
-            d1 = datetime.datetime.strptime(time_tag.text, "時間：%Y-%m-%d %H:%M")
+            d1 = datetime.datetime.strptime(time_tag.text.strip(), "時間：%Y-%m-%d %H:%M")
             d1 -= datetime.timedelta(hours=8)
             db_date_format = '%Y-%m-%d %H:%M:%S'
             date_res = d1.strftime(db_date_format)
             res_dict['news_published_date'] = date_res
         except Exception as e1:
             try:
-                d1 = datetime.datetime.strptime(time_tag.text, "時間：%Y-%m-%d %H:%M:%S")
+                d1 = datetime.datetime.strptime(time_tag.text.strip(), "時間：%Y-%m-%d %H:%M:%S")
                 d1 -= datetime.timedelta(hours=8)
                 db_date_format = '%Y-%m-%d %H:%M:%S'
                 date_res = d1.strftime(db_date_format)
                 res_dict['news_published_date'] = date_res
             except Exception as e2:
-                content_parser.logger.info('RTI url: {} date not process properly, error message {}'.format(url, e2))
+                print(e2)
+                #content_parser.logger.info('RTI url: {} date not process properly, error message {}'.format(url, e2))
 
     article_body_tag = soup.find('article', attrs = {'class' : None})
     temp_content, links, links_descs = [], [], []
@@ -70,7 +71,7 @@ def rti_content_processor(url):
         if p_tags:
             for p in p_tags:
                 if p.text:
-                    temp_content.append(p.text.strip())
+                    temp_content.append(html.unescape(p.text.strip()))
 
         if len(a_tags):
             for a in a_tags:
@@ -87,8 +88,8 @@ def rti_content_processor(url):
     if content:
         res_dict['news'] = content
     if not res_dict or 'news' not in res_dict:
-        content_parser.logger.error('RTI url: {} did not process properly'.format(url))
         return
+        content_parser.logger.error('RTI url: {} did not process properly'.format(url))
     return res_dict
 
 
