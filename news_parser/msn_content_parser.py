@@ -6,10 +6,12 @@ from bs4 import BeautifulSoup
 import datetime
 import time
 import re
+import html
 from content_parser import ContentParser
 
 start = time.time()
 requests.adapters.DEFAULT_RETRIES = 5 
+
 
 
 
@@ -79,7 +81,7 @@ def msn_content_processor(url):
                         break
                     elif p.text.strip()[0] in ('▲','▼'):
                         continue
-                    temp_content.append(p.text.strip())
+                    temp_content.append(html.unescape(p.text.strip()))
         elif div_tags:
             for div in div_tags:
                 if div.find('span'):
@@ -91,7 +93,7 @@ def msn_content_processor(url):
                         break
                     elif div.text.strip()[0] in ('▲','▼'):
                         continue
-                    temp_content.append(div.text.strip())
+                    temp_content.append(html.unescape(div.text.strip()))
             
         if len(a_tags):
             for a in a_tags:

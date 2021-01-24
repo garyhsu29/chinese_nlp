@@ -6,6 +6,7 @@ from bs4 import BeautifulSoup
 import datetime
 import time
 from content_parser import ContentParser
+import html
 
 start = time.time()
 
@@ -110,7 +111,7 @@ def ltn_content_processor(url):
                     p.span.decompose()
                 if p.text:
                     if p.text.strip() not in postfix :
-                        temp_content.append(p.text.strip())
+                        temp_content.append(html.unescape(p.text.strip()))
                     else:
                         break
         if len(a_tags):
@@ -133,7 +134,7 @@ def ltn_content_processor(url):
                     p.span.decompose()
                 if p.text:
                     if p.text.strip() not in postfix :
-                        temp_content.append(p.text.strip())
+                        temp_content.append(html.unescape(p.text.strip()))
                     else:
                         break
         if len(a_tags):
@@ -156,7 +157,7 @@ def ltn_content_processor(url):
                     p.span.decompose()
                 if p.text:
                     if p.text.strip() not in postfix :
-                        temp_content.append(p.text.strip())
+                        temp_content.append(html.unescape(p.text.strip()))
                     else:
                         break
         if len(a_tags):
