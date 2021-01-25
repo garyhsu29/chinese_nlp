@@ -65,15 +65,10 @@ def newstalk_content_processor(url):
     #print(article_body_tag)
     temp_content, links, links_descs = [], [], []
     if article_body_tag:
-        p_tags = article_body_tag.find_all('p', attrs = {'class': None})
-        p2_tags = article_body_tag.find_all('p', attrs = {'class': 'p1'})
+        p_tags = article_body_tag.find_all('p')#, attrs = {'class': None})
         a_tags = article_body_tag.find_all('a')
         if p_tags:
             for p in p_tags:
-                if p.text:
-                    temp_content.append(p.text.strip())
-        elif p2_tags:
-            for p in p2_tags:
                 if p.text:
                     temp_content.append(p.text.strip())
 
@@ -94,7 +89,7 @@ def newstalk_content_processor(url):
     if not res_dict or 'news' not in res_dict:
         content_parser.logger.error('NewsTalk url: {} did not process properly'.format(url))
         return
-
+        
     return res_dict
 
 content_parser = ContentParser('新頭殼要聞')

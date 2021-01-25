@@ -51,15 +51,20 @@ def pts_content_processor(url):
                 content_parser.logger.info('PTS date error {}, URL: {}'.format(e1, url))
 
     article_body_tag = soup.find('div', attrs = {'class':'article_content'})
+    article_body_tag_2 = soup.find('article', attrs = {'class': 'post-article'})
     if article_body_tag:
         content = article_body_tag.text.strip()
         if content:
             res_dict['news'] = content
+    elif article_body_tag_2:
+        content = article_body_tag_2.text.strip()
+        if content:
+            res_dict['news'] = content
+    
             
     if not res_dict or 'news' not in res_dict:
         content_parser.logger.error('PTS url: {} did not process properly'.format(url))
         return
-
     return res_dict
 
 content_parser = ContentParser('公視新聞網')
