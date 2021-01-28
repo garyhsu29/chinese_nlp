@@ -42,7 +42,7 @@ def ettoday_content_processor(url):
         res_dict['news_description'] = description_tag['content']
 
     time_tag = soup.find('meta', attrs = {'property': 'article:published_time'})
-
+    time_tag_2 = soup.find('time', attrs = {'itemprop': 'datePublished'}) 
     if time_tag:
         try:
             d1 = datetime.datetime.strptime(time_tag.get('content'), "%Y-%m-%dT%H:%M:%S+08:00") 
@@ -60,7 +60,23 @@ def ettoday_content_processor(url):
             except Exception as e2:
                 print(e2)
                 content_parser.logger.info('Ettoday date error {}, URL: {}'.format(e2, url))
-
+    elif time_tag_2:
+        try:
+            d1 = datetime.datetime.strptime(time_tag_2.get_text().strip(), "%Y-%m-%d %H:%M")
+            d1 -= datetime.timedelta(hours=8)
+            db_date_format = '%Y-%m-%d %H:%M:%S'
+            date_res = d1.strftime(db_date_format)
+            res_dict['news_published_date'] = date_res
+        except Exception as e2:
+            try:
+                d1 = datetime.datetime.strptime(time_tag_2.get_text().strip(), "%Y年%m月%d日 %H:%M")
+                d1 -= datetime.timedelta(hours=8)
+                db_date_format = '%Y-%m-%d %H:%M:%S'
+                date_res = d1.strftime(db_date_format)
+                res_dict['news_published_date'] = date_res
+            except Exception as e3:
+                print(e3)
+                content_parser.logger.info('Ettoday date error {}, URL: {}'.format(e2, url))
     article_body_tag = soup.find('div', attrs = {'itemprop':'articleBody'})
     temp_content = []
     links, links_descs = [], []
@@ -93,7 +109,6 @@ def ettoday_content_processor(url):
     if not res_dict or 'news' not in res_dict:
         content_parser.logger.error('Ettoday url: {} did not process properly'.format(url))
         return
-
     return res_dict
 
 content_parser = ContentParser('ETtoday')
