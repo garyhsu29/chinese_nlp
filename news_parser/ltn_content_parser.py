@@ -31,9 +31,9 @@ def ltn_content_processor(url):
     title_tag = soup.find("title")
     if title_tag:
         title_category = title_tag.string.split(' - ')
-        res_dict['news_title'] = title_category[0].strip()
+        res_dict['news_title'] = html.unescape(title_category[0].strip())
         if len(title_category) > 1:
-            res_dict['news_category'] = title_category[1].strip()
+            res_dict['news_category'] = html.unescape(title_category[1].strip())
         else:
             try:
                 res_dict['news_title'], res_dict['news_category'] = title_tag.string.split('|')
@@ -50,15 +50,15 @@ def ltn_content_processor(url):
     #Optional
     keywords_tag = soup.find('meta', attrs={'name': 'news_keywords'})
     if keywords_tag:
-        res_dict['news_keywords'] = keywords_tag['content']
+        res_dict['news_keywords'] = html.unescape(keywords_tag['content'])
 
     description_tag = soup.find('meta', attrs = {'name': 'description'})
     if description_tag:
-        res_dict['news_description'] = description_tag['content']
+        res_dict['news_description'] = html.unescape(description_tag['content'])
 
     time_tag_1 = soup.find('meta', attrs = {'property': 'article:published_time'})
     time_tag_2 = soup.find('meta', attrs = {'name': 'pubdate'})
-    #time_tag_3 = soup.find('span', attrs = {'class': 'time'})
+    time_tag_3 = soup.find('span', attrs = {'class': 'time'})
     if time_tag_1:
         try:
             d1 = datetime.datetime.strptime(time_tag_1.get('content'), "%Y-%m-%dT%H:%M:%S+08:00") 
@@ -76,7 +76,6 @@ def ltn_content_processor(url):
             except Exception as e2:
                 print('LTN date error {}, URL: {}'.format(e2, url))
                 #content_parser.logger.info('LTN date error {}, URL: {}'.format(e2, url))
-
     elif time_tag_2:
         try:
             d1 = datetime.datetime.strptime(time_tag_2.get('content'), "%Y-%m-%dT%H:%M:%S+08:00")
@@ -94,6 +93,24 @@ def ltn_content_processor(url):
             except Exception as e2:
                 print('LTN date error {}, URL: {}'.format(e2, url))
                 #content_parser.logger.info('LTN date error: {}, URL:{}'.format(e2, url))
+    elif time_tag_3:
+        try:
+            d1 = datetime.datetime.strptime(time_tag_3.get_text(), "%Y-%m-%d %H:%M")
+            d1 -= datetime.timedelta(hours=8)
+            db_date_format = '%Y-%m-%d %H:%M:%S'
+            date_res = d1.strftime(db_date_format)
+            res_dict['news_published_date'] = date_res
+        except Exception as e1:
+            try:
+                d1 = datetime.datetime.strptime(time_tag_3.get_text(), "%Y-%m-%d %H:%M:%S")
+                d1 -= datetime.timedelta(hours=8)
+                db_date_format = '%Y-%m-%d %H:%M:%S'
+                date_res = d1.strftime(db_date_format)
+                res_dict['news_published_date'] = date_res
+            except Exception as e2:
+                print('LTN date error {}, URL: {}'.format(e2, url))
+                #content_parser.logger.info('LTN date error: {}, URL:{}'.format(e2, url))
+                
 
     article_body_tag = soup.find('div', attrs = {'itemprop':'articleBody'})
     article_body_tag2 = soup.find('div', attrs = {'class':'text boxTitle boxText'})
@@ -156,7 +173,7 @@ def ltn_content_processor(url):
                 if p.find('span'):
                     p.span.decompose()
                 if p.text:
-                    if p.text.strip() not in postfix :
+                    if p.text.strip() not in postfix:
                         temp_content.append(html.unescape(p.text.strip()))
                     else:
                         break
@@ -167,13 +184,13 @@ def ltn_content_processor(url):
                         continue
                     if a.get_text().strip() and 'www' in a['href']:
                         links.append(a['href'])
-                        links_descs.append(a.get_text().strip())
+                        links_descs.append(html.unescape(a.get_text().strip()))
             res_dict['news_related_url'] = links
             res_dict['news_related_url_desc'] = links_descs
 
     content = '\n'.join(temp_content).strip()
     if content:
-        res_dict['news'] = content
+        res_dict['news'] = html.unescape(content)
 
     if not res_dict or 'news' not in res_dict:
         #print('LTN {}, did not process properly'.format(url))
