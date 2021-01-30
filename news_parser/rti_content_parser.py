@@ -20,11 +20,10 @@ def rti_content_processor(url):
     title_tag = soup.find("title")
     if title_tag:
         title_category = title_tag.string.split(' - ', 1)
-        res_dict['news_title'] = title_category[0]
+        res_dict['news_title'] = html.unescape(title_category[0])
     category_tag = soup.find('div', attrs = {'class':'swiper-wrapper'})
     if category_tag:
-        
-        res_dict['news_category'] = category_tag.find('a', attrs = {'class':'active'}).get_text().strip()
+        res_dict['news_category'] = html.unescape(category_tag.find('a', attrs = {'class':'active'}).get_text().strip())
 
     fb_app_tag = soup.find('meta', attrs = {'property':'fb:app_id'})
     if fb_app_tag:
@@ -38,11 +37,11 @@ def rti_content_processor(url):
     keywords_tag = soup.find('meta', attrs={'name': 'keywords'})
     if keywords_tag:
         keyword_lst = [keyword for keyword in keywords_tag['content'].split(',') if keyword not in reserved_keywords]
-        res_dict['news_keywords'] = ','.join(keyword_lst)
+        res_dict['news_keywords'] = html.unescape(','.join(keyword_lst))
 
     description_tags = soup.find_all('meta', attrs = {'name': 'description'})
     if description_tags:
-        res_dict['news_description'] = description_tags[1]['content']
+        res_dict['news_description'] = html.unescape(description_tags[1]['content'])
 
     time_tag = soup.find('li', attrs = {'class': 'date'})
     if time_tag:
@@ -80,16 +79,16 @@ def rti_content_processor(url):
                         continue
                     if a.get_text().strip() and 'www' in a['href']:
                         links.append(a['href'])
-                        links_descs.append(a.get_text().strip())
+                        links_descs.append(html.unescape(a.get_text().strip()))
             res_dict['news_related_url'] = links
             res_dict['news_related_url_desc'] = links_descs
             
     content = '\n'.join(temp_content).strip()
     if content:
-        res_dict['news'] = content
+        res_dict['news'] = html.unescape(content)
     if not res_dict or 'news' not in res_dict:
-        return
         content_parser.logger.error('RTI url: {} did not process properly'.format(url))
+        return
     return res_dict
 
 
