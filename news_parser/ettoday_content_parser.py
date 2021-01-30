@@ -21,9 +21,9 @@ def ettoday_content_processor(url):
     title_tag = soup.find("title")
     if title_tag:
         title_category = title_tag.string.split(' | ')
-        res_dict['news_title'] = title_category[0]
+        res_dict['news_title'] = html.unescape(title_category[0])
         if len(title_category) > 1:
-            res_dict['news_category'] = title_category[1].strip()
+            res_dict['news_category'] = html.unescape(title_category[1].strip())
     fb_app_tag = soup.find('meta', attrs = {'property':'fb:app_id'})
     if fb_app_tag:
         res_dict['news_fb_app_id'] = str(fb_app_tag['content'])
@@ -35,11 +35,11 @@ def ettoday_content_processor(url):
     #Optional
     keywords_tag = soup.find('meta', attrs={'name': 'news_keywords'})
     if keywords_tag:
-        res_dict['news_keywords'] = keywords_tag['content']
+        res_dict['news_keywords'] = html.unescape(keywords_tag['content'])
 
     description_tag = soup.find('meta', attrs = {'name': 'description'})
     if description_tag:
-        res_dict['news_description'] = description_tag['content']
+        res_dict['news_description'] = html.unescape(description_tag['content'])
 
     time_tag = soup.find('meta', attrs = {'property': 'article:published_time'})
     time_tag_2 = soup.find('time', attrs = {'itemprop': 'datePublished'}) 
@@ -98,13 +98,13 @@ def ettoday_content_processor(url):
                         continue
                     if a.get_text().strip() and 'www' in a['href']:
                         links.append(a['href'])
-                        links_descs.append(a.get_text().strip().replace('\u3000', ' '))
+                        links_descs.append(html.unescape(a.get_text().strip()))
             res_dict['news_related_url'] = links
             res_dict['news_related_url_desc'] = links_descs
             
     content = '\n'.join(temp_content).strip()
     if content:
-        res_dict['news'] = content
+        res_dict['news'] = html.unescape(content)
 
     if not res_dict or 'news' not in res_dict:
         content_parser.logger.error('Ettoday url: {} did not process properly'.format(url))
