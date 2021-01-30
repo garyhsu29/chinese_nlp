@@ -23,12 +23,12 @@ def epoch_content_processor(url):
     title_tag = soup.find("title")
     if title_tag:
         title_category = title_tag.string.split(' | ', 1)
-        res_dict['news_title'] = title_category[0]
+        res_dict['news_title'] = html.unescape(title_category[0])
         
     
     category_tag = soup.find('meta', attrs = {'property':'article:section'})
     if category_tag:
-        res_dict['news_category'] = str(category_tag['content'])
+        res_dict['news_category'] = html.unescape(str(category_tag['content']))
         
         
     fb_app_tag = soup.find('meta', attrs = {'property':'fb:app_id'})
@@ -42,11 +42,11 @@ def epoch_content_processor(url):
     #Optional
     keywords_tag = soup.find('meta', attrs={'name': 'news_keywords'})
     if keywords_tag:
-        res_dict['news_keywords'] = keywords_tag['content']
+        res_dict['news_keywords'] = html.unescape(keywords_tag['content'])
 
     description_tag = soup.find('meta', attrs = {'name': 'description'})
     if description_tag:
-        res_dict['news_description'] = description_tag['content']
+        res_dict['news_description'] = html.unescape(description_tag['content'])
 
     time_tag = soup.find('meta', attrs = {'property': 'article:published_time'})
 
@@ -91,7 +91,7 @@ def epoch_content_processor(url):
                         continue
                     if a.get_text().strip() and 'www' in a['href']:
                         links.append(a['href'])
-                        links_descs.append(a.get_text().strip())
+                        links_descs.append(html.unescape(a.get_text().strip()))
             res_dict['news_related_url'] = links
             res_dict['news_related_url_desc'] = links_descs
     elif article_body_tag_2:
@@ -116,7 +116,7 @@ def epoch_content_processor(url):
             res_dict['news_related_url_desc'] = links_descs
     content = '\n'.join(temp_content).strip()
     if content:
-        res_dict['news'] = content
+        res_dict['news'] = html.unescape(content)
 
     if not res_dict or 'news' not in res_dict:
         return
