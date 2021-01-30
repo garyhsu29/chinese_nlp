@@ -21,9 +21,9 @@ def yahoo_content_processor(url):
     title_tag = soup.find("title")
     if title_tag:
         title_category = title_tag.string.split(' - ')
-        res_dict['news_title'] = title_category[0]
+        res_dict['news_title'] = html.unescape(title_category[0])
         if len(title_category) > 1:
-            res_dict['news_category'] = title_category[1]
+            res_dict['news_category'] = html.unescape(title_category[1])
     fb_app_tag = soup.find('meta', attrs = {'property':'fb:app_id'})
     if fb_app_tag:
         res_dict['news_fb_app_id'] = str(fb_app_tag['content'])
@@ -34,11 +34,11 @@ def yahoo_content_processor(url):
     #Optional
     keywords_tag = soup.find('meta', attrs={'name': 'news_keywords'})
     if keywords_tag:
-        res_dict['news_keywords'] = keywords_tag['content']
+        res_dict['news_keywords'] = html.unescape(keywords_tag['content'])
 
     description_tag = soup.find('meta', attrs = {'name': 'description'})
     if description_tag:
-        res_dict['news_description'] = description_tag['content']
+        res_dict['news_description'] = html.unescape(description_tag['content'])
 
     time_tag = soup.find('time')
     if time_tag:
@@ -63,12 +63,12 @@ def yahoo_content_processor(url):
         if p_tags:
             for index, p in enumerate(p_tags):
                 if p.get('content'):
-                    temp_content.append(p.get_text().strip())
+                    temp_content.append(html.unescape(p.get_text().strip()))
         if a_tags:
             for a in a_tags:
                 if a.get_text().strip():
                     links.append(a['href'])
-                    links_descs.append(a.get_text().strip())
+                    links_descs.append(html.unescape(a.get_text().strip()))
             res_dict['news_related_url'] = links
             res_dict['news_related_url_desc'] = links_descs
     elif caas_body_tag:
@@ -81,7 +81,7 @@ def yahoo_content_processor(url):
             for a in a_tags:
                 if a.get_text().strip():
                     links.append(a['href'])
-                    links_descs.append(a.get_text().strip())
+                    links_descs.append(html.unescape(a.get_text().strip()))
             res_dict['news_related_url'] = links
             res_dict['news_related_url_desc'] = links_descs
     if temp_content:    
@@ -91,7 +91,7 @@ def yahoo_content_processor(url):
         else:
             prefix = ''
         content = prefix + '\n'.join(temp_content)#.replace('。 ', '。\n')
-        res_dict['news'] = content
+        res_dict['news'] = html.unescape(content)
         return res_dict
     else:
         content_parser_1.logger.error('Yahoo url: {} did not process properly'.format(url))
