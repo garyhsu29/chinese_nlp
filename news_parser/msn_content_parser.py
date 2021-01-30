@@ -31,17 +31,17 @@ def msn_content_processor(url):
         return 
     title_tag = soup.find("title")
     if title_tag:
-        res_dict['news_title'] = title_tag.text.strip()
+        res_dict['news_title'] = html.unescape(title_tag.text.strip())
         
     
     category_tag = soup.find('div', attrs = {'class':'logowrapper'})
     if category_tag:
         _, category = category_tag.get_text().strip().split('\n')
-        res_dict['news_category'] = category
+        res_dict['news_category'] = html.unescape(category)
         
     description_tag = soup.find('meta', attrs = {'name': 'description'})
     if description_tag:
-        res_dict['news_description'] = description_tag['content']
+        res_dict['news_description'] = html.unescape(description_tag['content'])
 
     time_tag = soup.find('div', attrs = {'class': 'timeinfo-txt'})
     if time_tag:
@@ -102,13 +102,13 @@ def msn_content_processor(url):
                         continue
                     if a.get_text().strip() and 'www' in a['href']:
                         links.append(a['href'])
-                        links_descs.append(a.get_text().strip())
+                        links_descs.append(html.unescape(a.get_text().strip()))
             res_dict['news_related_url'] = links
             res_dict['news_related_url_desc'] = links_descs
 
     if len(temp_content):
         content = '\n'.join(temp_content)
-        res_dict['news'] = content
+        res_dict['news'] = html.unescape(content)
 
     if not res_dict or 'news' not in res_dict: 
         content_parser.logger.error('MSN url: {} did not process properly'.format(url))
