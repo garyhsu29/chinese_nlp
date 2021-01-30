@@ -26,9 +26,9 @@ def pchome_content_processor(url):
     title_tag = soup.find("title")
     if title_tag:
         title_category = title_tag.string.rsplit('-', 2)
-        res_dict['news_title'] = title_category[0].strip()
+        res_dict['news_title'] = html.unescape(title_category[0].strip())
         if len(title_category) > 1:
-            res_dict['news_category'] = title_category[-2].strip()
+            res_dict['news_category'] = html.unescape(title_category[-2].strip())
             
     fb_app_tag = soup.find('meta', attrs = {'property':'fb:app_id'})
     if fb_app_tag:
@@ -41,11 +41,11 @@ def pchome_content_processor(url):
     #Optional
     keywords_tag = soup.find('meta', attrs={'name': 'keywords'})
     if keywords_tag:
-        res_dict['news_keywords'] = keywords_tag['content']
+        res_dict['news_keywords'] = html.unescape(keywords_tag['content'])
 
     description_tag = soup.find('meta', attrs = {'name': 'description'})
     if description_tag:
-        res_dict['news_description'] = description_tag['content']
+        res_dict['news_description'] = html.unescape(description_tag['content'])
 
     time_tag = soup.find('time')
 
@@ -74,7 +74,7 @@ def pchome_content_processor(url):
         if content:
             content = re.sub('(\n)+', '\n', html.unescape(content))
             content = re.sub(r'(相關新聞[\s\S]+)', '', content)
-            res_dict['news'] = content 
+            res_dict['news'] = html.unescape(content)
             
     if not res_dict or 'news' not in res_dict:
         content_parser.logger.error('PChome url: {} did not process properly'.format(url))
