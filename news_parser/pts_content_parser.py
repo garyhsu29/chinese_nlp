@@ -5,6 +5,7 @@ import requests
 from bs4 import BeautifulSoup
 import datetime
 import time
+import html
 from content_parser import ContentParser
 
 start = time.time()
@@ -20,7 +21,7 @@ def pts_content_processor(url):
     title_tag = soup.find("title")
     if title_tag:
         title_category = title_tag.string.rsplit(' | ', 1)
-        res_dict['news_title'] = title_category[0].strip()
+        res_dict['news_title'] = html.unescape(title_category[0].strip())
             
     fb_app_tag = soup.find('meta', attrs = {'property':'fb:app_id'})
     if fb_app_tag:
@@ -30,14 +31,33 @@ def pts_content_processor(url):
     #Optional
     keywords_tag = soup.find('meta', attrs={'name': 'keywords'})
     if keywords_tag:
-        res_dict['news_keywords'] = keywords_tag['content']
+        res_dict['news_keywords'] = html.unescape(keywords_tag['content'])
 
     description_tags = soup.find_all('meta', attrs = {'name': 'description'})
     if len(description_tags) > 1:
-        res_dict['news_description'] = description_tags[1]['content']
+        res_dict['news_description'] = html.unescape(description_tags[1]['content'])
         
-    time_tag = soup.find('div', attrs = {'class': 'maintype-wapper hidden-lg hidden-md'})
+    time_tag_2 = soup.find('div', attrs = {'class': 'maintype-wapper hidden-lg hidden-md'})
+    time_tag = soup.find('time', attrs = {'class': None})
     if time_tag:
+        try:
+            d1 = datetime.datetime.strptime(time_tag.get_text(), "%Y-%m-%d %H:%M") 
+            d1 -= datetime.timedelta(hours=8)
+            db_date_format = '%Y-%m-%d %H:%M:%S'
+            date_res = d1.strftime(db_date_format)
+            res_dict['news_published_date'] = date_res
+        except Exception as e1:
+            try:
+                d1 = datetime.datetime.strptime(time_tag.get_text(), "%Y-%m-%d %H:%M:%S") 
+                d1 -= datetime.timedelta(hours=8)
+                db_date_format = '%Y-%m-%d %H:%M:%S'
+                date_res = d1.strftime(db_date_format)
+                res_dict['news_published_date'] = date_res
+            except Exception as e2:
+                content_parser.logger.info('PTS date error {}, URL: {}'.format(e2, url))
+                
+        
+    elif time_tag_2:
         date_tag = time_tag.find('h2')
         if date_tag:
             try:
@@ -49,24 +69,25 @@ def pts_content_processor(url):
             except Exception as e1:
                 print(e1)
                 content_parser.logger.info('PTS date error {}, URL: {}'.format(e1, url))
+    
 
     article_body_tag = soup.find('div', attrs = {'class':'article_content'})
     article_body_tag_2 = soup.find('article', attrs = {'class': 'post-article'})
     if article_body_tag:
         content = article_body_tag.text.strip()
         if content:
-            res_dict['news'] = content
+            res_dict['news'] = html.unescape(content)
     elif article_body_tag_2:
         content = article_body_tag_2.text.strip()
         if content:
-            res_dict['news'] = content
+            res_dict['news'] = html.unescape(content)
     
             
     if not res_dict or 'news' not in res_dict:
         content_parser.logger.error('PTS url: {} did not process properly'.format(url))
         return
-    return res_dict
 
+    return res_dict
 content_parser = ContentParser('公視新聞網')
 # Query the data with source name
 unprocessed_data = content_parser.content_query()
