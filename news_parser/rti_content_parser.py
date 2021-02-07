@@ -11,7 +11,7 @@ start = time.time()
 
 requests.adapters.DEFAULT_RETRIES = 5 
 
-def rti_content_processor(url):
+def rti_content_processor(rss_id, url):
     res_dict = {}
     r = requests.get(url, headers = content_parser.headers)
     web_content = r.text
@@ -88,6 +88,7 @@ def rti_content_processor(url):
         res_dict['news'] = html.unescape(content)
     if not res_dict or 'news' not in res_dict:
         content_parser.logger.error('RTI url: {} did not process properly'.format(url))
+        content_parser.errors['process_empty_content_(rss_id)'].append([rss_id, url])
         return
     return res_dict
 
@@ -97,6 +98,8 @@ content_parser = ContentParser('Rti 中央廣播電臺')
 # Query the data with source name
 unprocessed_data = content_parser.content_query()
 content_parser.content_processor(unprocessed_data, rti_content_processor)
+if content_parser.errors:
+    content_parser.sent_error_email()
 content_parser.encoding_cursor.close()
 content_parser.mydb.close()
 content_parser.logger.info("Processed RTI {} examples in {} seconds".format(len(unprocessed_data), time.time() - start))

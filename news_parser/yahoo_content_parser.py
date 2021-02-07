@@ -11,7 +11,7 @@ import random
 
 requests.adapters.DEFAULT_RETRIES = 5 
 
-def yahoo_content_processor(url):
+def yahoo_content_processor(rss_id, url):
     res_dict = {}
     r = requests.get(url, headers = content_parser_1.headers)
     web_content = r.text
@@ -95,6 +95,7 @@ def yahoo_content_processor(url):
         return res_dict
     else:
         content_parser_1.logger.error('Yahoo url: {} did not process properly'.format(url))
+        content_parser.errors['process_empty_content_(rss_id)'].append([rss_id, url])
         return
 
 
@@ -104,7 +105,8 @@ start = time.time()
 content_parser_1 = ContentParser('Yahoo Source 1')
 unprocessed_data_1 = content_parser_1.content_query()
 content_parser_1.content_processor(unprocessed_data_1, yahoo_content_processor)
-
+if content_parser_1.errors:
+    content_parser_1.sent_error_email()
 content_parser_1.encoding_cursor.close()
 content_parser_1.mydb.close()
 content_parser_1.logger.info("Processed Yahoo Source 1 {} examples in {} seconds".format(len(unprocessed_data_1), time.time() - start))
@@ -114,7 +116,8 @@ start = time.time()
 content_parser_2 = ContentParser('Yahoo奇摩新聞')
 unprocessed_data_2 = content_parser_2.content_query()
 content_parser_2.content_processor(unprocessed_data_2, yahoo_content_processor)
-
+if content_parser_2.errors:
+    content_parser_2.sent_error_email()
 content_parser_2.encoding_cursor.close()
 content_parser_2.mydb.close()
 content_parser_2.logger.info("Processed Yahoo News {} examples in {} seconds".format(len(unprocessed_data_2), time.time() - start))
@@ -124,7 +127,8 @@ start = time.time()
 content_parser_3 = ContentParser('Yahoo奇摩股市')
 unprocessed_data_3 = content_parser_3.content_query()
 content_parser_3.content_processor(unprocessed_data_3, yahoo_content_processor)
-
+if content_parser_3.errors:
+    content_parser_3.sent_error_email()
 content_parser_3.encoding_cursor.close()
 content_parser_3.mydb.close()
 content_parser_3.logger.info("Processed Yahoo Stock {} examples in {} seconds".format(len(unprocessed_data_3), time.time() - start))

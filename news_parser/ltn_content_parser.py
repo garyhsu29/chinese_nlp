@@ -13,7 +13,7 @@ start = time.time()
 requests.adapters.DEFAULT_RETRIES = 5 
 
 
-def ltn_content_processor(url):
+def ltn_content_processor(rss_id, url):
     postfix = ["""一手掌握經濟脈動
     點我訂閱自由財經Youtube頻道""", 
     """☆民眾如遇同居關係暴力情形，可撥打113保護專線，或向各地方政府家庭暴力防治中心求助☆""", 
@@ -195,6 +195,7 @@ def ltn_content_processor(url):
     if not res_dict or 'news' not in res_dict:
         #print('LTN {}, did not process properly'.format(url))
         content_parser.logger.error('LTN url: {} did not process properly'.format(url))
+        content_parser.errors['process_empty_content_(rss_id)'].append([rss_id, url])
         return
     return res_dict
 
@@ -203,6 +204,8 @@ content_parser = ContentParser('自由時報')
 # Query the data with source name
 unprocessed_data = content_parser.content_query()
 content_parser.content_processor(unprocessed_data, ltn_content_processor)
+if content_parser.errors:
+    content_parser.sent_error_email()
 content_parser.encoding_cursor.close()
 content_parser.mydb.close()
 content_parser.logger.info("Processed LTN {} examples in {} seconds".format(len(unprocessed_data), time.time() - start))

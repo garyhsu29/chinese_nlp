@@ -13,7 +13,7 @@ start = time.time()
 requests.adapters.DEFAULT_RETRIES = 5 
 
 
-def udn_content_processor(url):
+def udn_content_processor(rss_id, url):
     res_dict = {}
     r = requests.get(url, headers = content_parser.headers)
     r.encoding='utf-8'
@@ -100,6 +100,7 @@ def udn_content_processor(url):
 
     if not res_dict or 'news' not in res_dict:
         content_parser.logger.error('udn url: {} did not process properly'.format(url))
+        content_parser.errors['process_empty_content_(rss_id)'].append([rss_id, url])
         return
         
 
@@ -111,6 +112,8 @@ content_parser = ContentParser('經濟日報')
 unprocessed_data = content_parser.content_query()
 
 content_parser.content_processor(unprocessed_data, udn_content_processor)
+if content_parser.errors:
+    content_parser.sent_error_email()
 content_parser.encoding_cursor.close()
 content_parser.mydb.close()
 content_parser.logger.info("Processed UDN {} examples in {} seconds".format(len(unprocessed_data), time.time() - start))
