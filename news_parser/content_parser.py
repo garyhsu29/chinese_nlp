@@ -24,9 +24,9 @@ with open(os.path.join(parent_path, 'configs', 'email_pw.config'), 'rb') as f:
 
 
 class ContentParser(object):
-    def __init__(self, source_name):
+    def __init__(self, source_name, process_count = 200):
         self.headers = {'user-agent': 'Mozilla/5.0 (Macintosh Intel Mac OS X 10_13_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.181 Safari/537.36',  'Connection': 'close'}
-        
+        self.process_count = process_count
         self.mydb = mysql.connector.connect(
             host = configs['host'],
             user =  configs['user'],
@@ -63,7 +63,7 @@ class ContentParser(object):
     def content_query(self):
         mycursor = self.mydb.cursor(buffered = True)
         # rss_source LIKE '%Yahoo!奇摩股市%'rss_source LIKE %s ORDER BY created_time DESC
-        mycursor.execute("SELECT news_rss_feeds_id, news_source, news_url FROM news_rss_feeds WHERE processed_status = 0 AND processed_success = 0  AND news_source = %s LIMIT 200", (self.source_name,))
+        mycursor.execute("SELECT news_rss_feeds_id, news_source, news_url FROM news_rss_feeds WHERE processed_status = 0 AND processed_success = 0  AND news_source = %s LIMIT %s", (self.source_name, self.process_count))
         myresult = mycursor.fetchall()
         #print(myresult)
         mycursor.close()

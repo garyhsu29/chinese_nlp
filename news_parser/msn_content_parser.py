@@ -117,7 +117,7 @@ def msn_content_processor(rss_id, url):
         #print('MSN url: {} did not process properly'.format(url))
         return 
     return res_dict
-content_parser = ContentParser('MSN')
+content_parser = ContentParser('MSN', 100)
 # Query the data with source name
 unprocessed_data = content_parser.content_query()
 
