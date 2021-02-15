@@ -36,9 +36,10 @@ def msn_content_processor(rss_id, url):
     
     category_tag = soup.find('div', attrs = {'class':'logowrapper'})
     if category_tag:
-        _, category = category_tag.get_text().strip().split('\n')
-        res_dict['news_category'] = html.unescape(category)
-        
+        if len(category_tag.get_text().strip().split('\n')) == 2:
+            _, category = category_tag.get_text().strip().split('\n')
+            res_dict['news_category'] = html.unescape(category)
+            
     description_tag = soup.find('meta', attrs = {'name': 'description'})
     if description_tag:
         res_dict['news_description'] = html.unescape(description_tag['content'])
