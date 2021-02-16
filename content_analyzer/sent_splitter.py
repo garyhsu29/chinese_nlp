@@ -13,12 +13,12 @@ start = time.time()
 DIR_PATH = os.path.dirname(os.path.realpath(__file__))
 
 FORMAT = '%(asctime)s %(levelname)s: %(message)s'
-logging.basicConfig(level=logging.INFO, filename=os.path.join(DIR_PATH, 'sent_splitter.log'), filemode='a', format=FORMAT)
-raw_df = query_from_db("SELECT news_id, news FROM news_contents WHERE processed_status = 0 LIMIT 100;")
+logging.basicConfig(level=logging.INFO, filename=os.path.join(DIR_PATH, 'logs', 'sent_splitter.log'), filemode='a', format=FORMAT)
+raw_df = query_from_db("SELECT news_id, news FROM news_contents WHERE processed_status = 0 LIMIT 300;")
 
 
 
-with open(os.path.join(parent_dir, 'configs', 'loc2server.config'), 'rb') as f:
+with open(os.path.join(parent_dir, 'configs', 'server2server.config'), 'rb') as f:
     configs = pickle.load(f)
 
 author_header = r'^((（.+?）)|(\(.+?\))|(【.+?】)|(〔.+?〕)|(\[.+?\])|(［.+?］))\s*'
