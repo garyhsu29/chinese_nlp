@@ -5,7 +5,7 @@ import pickle
  
 DIR_PATH = os.path.dirname(os.path.realpath(__file__))
 
-with open(os.path.join(DIR_PATH, 'configs', 'loc2server.config'), 'rb') as f:
+with open(os.path.join(DIR_PATH, 'configs', 'server2server.config'), 'rb') as f:
     configs = pickle.load(f)
 
 
