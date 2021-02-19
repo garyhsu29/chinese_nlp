@@ -104,8 +104,8 @@ def sent_level_analysis(raw_df):
     for index, (content_sent_id, sent) in raw_df.iterrows():
         insert_process_flag(content_sent_id, 'sent-analysis')
         try:
-            word_sentence_list  = ws_driver(sent, use_delim=False)
-            entity_sentence_list = ner_driver(sent, use_delim=False)
+            word_sentence_list  = ws_driver([sent], use_delim=False)
+            entity_sentence_list = ner_driver([sent], use_delim=False)
             pos_sentence_list = pos_driver(word_sentence_list, use_delim=False)
             spacy_doc = nlp(sent)
             word_sent_list_spacy, word_pos_list_spacy, word_dep_list_spacy = zip(*[(token.text, token.tag_, token.dep_) for token in spacy_doc])
