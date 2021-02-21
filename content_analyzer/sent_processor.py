@@ -22,7 +22,7 @@ os.environ['KMP_DUPLICATE_LIB_OK']= 'True'
 
 
 FORMAT = '%(asctime)s %(levelname)s: %(message)s'
-logging.basicConfig(level=logging.INFO, filename=os.path.join(DIR_PATH, 'logs', 'sent_splitter.log'), filemode='a', format=FORMAT)
+logging.basicConfig(level=logging.INFO, filename=os.path.join(DIR_PATH, 'logs', 'sent_processor.log'), filemode='a', format=FORMAT)
 
 
 
