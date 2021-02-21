@@ -103,7 +103,9 @@ def insert_process_flag(news_sent_id, process_name):
 def sent_level_analysis(raw_df):
     for index, (content_sent_id, sent) in raw_df.iterrows():
         insert_process_flag(content_sent_id, 'sent-analysis')
+        process_start = time.time()
         try:
+
             word_sentence_list  = ws_driver([sent], use_delim=False)
             entity_sentence_list = ner_driver([sent], use_delim=False)
             pos_sentence_list = pos_driver(word_sentence_list, use_delim=False)
@@ -113,15 +115,18 @@ def sent_level_analysis(raw_df):
         except Exception as e:
             logging.error('NLP process Error: {}\n Content ID: {}'.format(e, content_sent_id))
             print('NLP process Error: {}\n Content ID: {}'.format(e, content_sent_id))
-        
-        
+        print("Process record in {} seconds".format(time.time() - process_start))
+        insert_start = time.time()
         insert_sentlevel_info(word_sentence_list[0],  pos_sentence_list[0], content_sent_id, 'ckip-transformer')
         insert_sentlevel_info(word_sent_list_spacy, word_pos_list_spacy, content_sent_id, 'spacy-transformer', word_dep_list_spacy)
         insert_ner_info(entity_sentence_list[0], content_sent_id, 'ckip-transformer')
         insert_ner_info(entity_sent_list_spacy, content_sent_id, 'spacy-transformer')
+        print("Insert record in {} seconds".format(time.time() - insert_start))
      
 
-raw_df = query_from_db("SELECT nns.news_sent_id, nns.sent FROM news_db.news_sents nns WHERE not exists (SELECT 1 FROM news_db.sent_processes sp WHERE sp.process_name = \'sent-analysis\' and sp.news_sent_id = nns.news_sent_id) LIMIT 100")
+
+raw_df = query_from_db("SELECT nns.news_sent_id, nns.sent FROM news_db.news_sents nns WHERE not exists (SELECT 1 FROM news_db.sent_processes sp WHERE sp.process_name = \'sent-analysis\' and sp.news_sent_id = nns.news_sent_id) LIMIT 10")
+print("finish load the data in {} seconds".format(time.time() - start))
 sent_level_analysis(raw_df)
 mydb.close()
 logging.error('Finish process {} examples in {} seconds'.format(len(raw_df), time.time() - start))
