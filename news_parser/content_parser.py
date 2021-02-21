@@ -81,8 +81,8 @@ class ContentParser(object):
             mycursor.execute(sql, list(res_dict.values()))
         except Exception as e:
             self.logger.error('Content insert error: {}'.format(e))
-            self.errors['duplicate_entry_(rss_id)'].append(rss_id)
-            print(e)
+            #self.errors['duplicate_entry_(rss_id)'].append(rss_id)
+            #sprint(e)
         else:
             self.mydb.commit()
             myresult = mycursor.lastrowid

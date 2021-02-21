@@ -10,7 +10,7 @@ DIR_PATH = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(parent_dir)
 
 from db_func import query_from_db
-
+start = time.time()
 # Initialize drivers
 ws_driver  = CkipWordSegmenter(level=3)
 pos_driver = CkipPosTagger(level=3)
@@ -25,7 +25,7 @@ FORMAT = '%(asctime)s %(levelname)s: %(message)s'
 logging.basicConfig(level=logging.INFO, filename=os.path.join(DIR_PATH, 'logs', 'sent_splitter.log'), filemode='a', format=FORMAT)
 
 
-start = time.time()
+
 
 
 with open(os.path.join(parent_dir, 'configs', 'server2server.config'), 'rb') as f:
