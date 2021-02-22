@@ -125,7 +125,7 @@ def sent_level_analysis(raw_df):
      
 
 
-raw_df = query_from_db("SELECT * FROM news_db.sent_source_view LIMIT 10;")
+raw_df = query_from_db("SELECT * FROM news_db.sent_source_view LIMIT 100;")
 print("finish load the data in {} seconds".format(time.time() - start))
 sent_level_analysis(raw_df)
 mydb.close()
