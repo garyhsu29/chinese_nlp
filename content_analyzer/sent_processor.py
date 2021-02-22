@@ -125,7 +125,7 @@ def sent_level_analysis(raw_df):
      
 
 
-raw_df = query_from_db("SELECT nns.news_sent_id, nns.sent FROM news_db.news_sents nns WHERE not exists (SELECT 1 FROM news_db.sent_processes sp WHERE sp.process_name = \'sent-analysis\' and sp.news_sent_id = nns.news_sent_id) LIMIT 100")
+raw_df = query_from_db("SELECT * FROM news_db.sent_source_view LIMIT 10;")
 print("finish load the data in {} seconds".format(time.time() - start))
 sent_level_analysis(raw_df)
 mydb.close()
