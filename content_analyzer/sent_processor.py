@@ -105,13 +105,15 @@ def sent_level_analysis(raw_df):
         insert_process_flag(content_sent_id, 'sent-analysis')
         process_start = time.time()
         try:
-
             word_sentence_list  = ws_driver([sent], use_delim=False)
             entity_sentence_list = ner_driver([sent], use_delim=False)
             pos_sentence_list = pos_driver(word_sentence_list, use_delim=False)
+            print("Ckip process time {} seconds".format(time.time() - process_start))
+            spacy_start = time.time()
             spacy_doc = nlp(sent)
             word_sent_list_spacy, word_pos_list_spacy, word_dep_list_spacy = zip(*[(token.text, token.tag_, token.dep_) for token in spacy_doc])
             entity_sent_list_spacy = [(ent.text, ent.label_, (ent.start_char, ent.end_char)) for ent in spacy_doc.ents]
+            print("Ckip process time {} seconds".format(time.time() - spacy_start))
         except Exception as e:
             logging.error('NLP process Error: {}\n Content ID: {}'.format(e, content_sent_id))
             print('NLP process Error: {}\n Content ID: {}'.format(e, content_sent_id))
