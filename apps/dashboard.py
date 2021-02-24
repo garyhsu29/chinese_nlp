@@ -6,7 +6,7 @@ import pandas as pd
 from collections import Counter
 cur_dir_name = os.path.dirname(os.path.abspath(__file__))
 parent_dir_name = os.path.dirname(cur_dir_name)
-sys.path.append(dir_name)
+sys.path.append(cur_dir_name)
 from db_func import query_from_db
 from wordcloud import WordCloud
 from tf_idf import customize_tfidf
