@@ -5,7 +5,7 @@ from datetime import timedelta, datetime
 import pandas as pd
 from collections import Counter
 dir_name = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(dir_name)
 from db_func import query_from_db
 from wordcloud import WordCloud
 from tf_idf import customize_tfidf
