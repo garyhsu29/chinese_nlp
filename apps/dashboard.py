@@ -10,6 +10,8 @@ sys.path.append(parent_dir_name)
 from db_func import query_from_db
 from wordcloud import WordCloud
 from tf_idf import customize_tfidf
+import pytz
+from datetime import datetime
 
 
 font = os.path.join(cur_dir_name, 'SourceHanSansTW-Regular.otf')
@@ -51,8 +53,14 @@ def get_keywords_by_date():
 	kw_df['published_date'] = kw_df['published_date'].dt.date
 	return kw_df
 
+def get_ner_by_date(selected_date):
+	ner_df = query_from_db("""SELECT CAST(nkv.news_published_date AS DATE) AS published_date, nkv.ent_text, nkv.ent_type 
+		FROM news_db.news_kw_view nkv
+		WHERE CAST(nkv.news_published_date AS DATE) = '{}';""".format(selected_date))
+	return ner_df
+
 if __name__ == '__main__':
-	module = st.sidebar.selectbox('Mode: ', ['Crawling DB analysis', 'News Analysis (Basic Count)', 'New Analysis (TF-IDF)'])
+	module = st.sidebar.selectbox('Mode: ', ['Crawling DB analysis', 'News Analysis (Basic Count)', 'New Analysis (TF-IDF)', 'NER Results'])
 	if module == 'Crawling DB analysis':
 		mode = st.sidebar.selectbox('Mode: ', ['Overview (Parse All)', 'Overview (Raw RSS)', 
 			'Detailed (Raw RSS)', 'Overview (Parse Success)', 'Datailed (Parse Success)', 'Overview (Parse Failed)', 'Detailed (Parse Failed)'])
@@ -236,3 +244,16 @@ if __name__ == '__main__':
 		fig = go.Figure([go.Bar(x = count[::-1], y = words[::-1], orientation='h')])
 		fig.update_layout(font_size = 12)
 		st.write(fig)
+	elif module == 'NER Results':
+		
+		end_date = datetime.now(tz = pytz.timezone('Asia/Taipei')).date()
+		start_date = datetime.strptime("2021-01-19", "%Y-%m-%d")
+		selected_date = st.date_input('Select date: ', end_date, min_value = start_date  , max_value = end_date)
+		ent_type_raw = st.selectbox('Entity Type: ', ['Person', "Organization"])
+		ent_type_dict = {'Person': 'PERSON', 'Organization':"ORG"}
+		ent_type = ent_type_dict[ent_type_raw]
+		ner_df = get_ner_by_date(selected_date)
+
+
+
+		st.write(ner_df[ner_df['ent_type'] == ent_type].groupby(['ent_text']).agg('count')['ent_type'])
