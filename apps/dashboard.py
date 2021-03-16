@@ -60,7 +60,7 @@ def get_ner_by_date(selected_date):
 	return ner_df
 
 if __name__ == '__main__':
-	module = st.sidebar.selectbox('Mode: ', ['Crawling DB analysis', 'News Analysis (Basic Count)', 'New Analysis (TF-IDF)', 'NER Results'])
+	module = st.sidebar.selectbox('Mode: ', ['Crawling DB analysis', 'News Analysis (Basic Count)', 'New Analysis (TF-IDF)', 'New Analysis (NER Count)'])
 	if module == 'Crawling DB analysis':
 		mode = st.sidebar.selectbox('Mode: ', ['Overview (Parse All)', 'Overview (Raw RSS)', 
 			'Detailed (Raw RSS)', 'Overview (Parse Success)', 'Datailed (Parse Success)', 'Overview (Parse Failed)', 'Detailed (Parse Failed)'])
@@ -216,7 +216,7 @@ if __name__ == '__main__':
 		fig.update_layout(font_size = 12)
 		st.write(fig)
 	elif module == 'New Analysis (TF-IDF)':
-		stop_kw_list = set(['自由時報', '自由時報電子報', '大紀元', 'ltn', '自由娛樂', 'LTN', 'Liberty Times Net', 'nownews'])
+		#stop_kw_list = set(['自由時報', '自由時報電子報', '大紀元', 'ltn', '自由娛樂', 'LTN', 'Liberty Times Net', 'nownews'])
 		kw_df = get_keywords_by_date()
 		st.title("Word of a Day")
 		last_date = max(kw_df['published_date'])
@@ -244,7 +244,7 @@ if __name__ == '__main__':
 		fig = go.Figure([go.Bar(x = count[::-1], y = words[::-1], orientation='h')])
 		fig.update_layout(font_size = 12)
 		st.write(fig)
-	elif module == 'NER Results':
+	elif module == 'New Analysis (NER Count)':
 		
 		end_date = datetime.now(tz = pytz.timezone('Asia/Taipei')).date()
 		start_date = datetime.strptime("2021-01-19", "%Y-%m-%d")
@@ -253,7 +253,16 @@ if __name__ == '__main__':
 		ent_type_dict = {'Person': 'PERSON', 'Organization':"ORG"}
 		ent_type = ent_type_dict[ent_type_raw]
 		ner_df = get_ner_by_date(selected_date)
-
-
-
-		st.write(ner_df[ner_df['ent_type'] == ent_type].groupby(['ent_text']).agg('count')['ent_type'])
+		ner_df = ner_df.drop(columns = ['published_date'])
+		ner_df = ner_df[ner_df['ent_type'] == ent_type].groupby(['ent_text']).agg('count')['ent_type'].sort_values(ascending = False)
+		topn = st.slider('Most Common Words', 0, 50, 10, 1)
+		my_wordcloud = WordCloud(max_words = topn, background_color='white',font_path=font, width=700, height=300)
+		my_wordcloud.generate_from_frequencies(ner_df)
+		image = my_wordcloud.to_image()
+		st.image(image)
+		words = ner_df.index[:topn]
+		counts = ner_df.values[:topn]
+		fig = go.Figure([go.Bar(x = counts[::-1], y = words[::-1], orientation='h')])
+		fig.update_layout(font_size = 12)
+		st.write(fig)
+		
