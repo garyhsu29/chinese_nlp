@@ -47,20 +47,31 @@ def newstalk_content_processor(rss_id, url):
     if time_tag:
         try:
             d1 = datetime.datetime.strptime(time_tag.get('content'), "%Y-%m-%dT%H:%M:%S+08:00") 
+            d2 = d1.date()
             d1 -= datetime.timedelta(hours=8)
-            db_date_format = '%Y-%m-%d %H:%M:%S'
-            date_res = d1.strftime(db_date_format)
-            res_dict['news_published_date'] = date_res
+            db_time_format = '%Y-%m-%d %H:%M:%S'
+            time_res = d1.strftime(db_time_format)
+            res_dict['published_time'] = time_res
+            
+            db_date_format = '%Y-%m-%d'
+            date_res = d2.strftime(db_date_format)
+            res_dict['published_date'] = date_res
         except Exception as e1:
             try:
                 d1 = datetime.datetime.strptime(time_tag.get('content'), "%Y-%m-%dT%H:%M:%SZ") 
+                d2 = d1.date()
                 d1 -= datetime.timedelta(hours=8)
-                db_date_format = '%Y-%m-%d %H:%M:%S'
-                date_res = d1.strftime(db_date_format)
-                res_dict['news_published_date'] = date_res
+                db_time_format = '%Y-%m-%d %H:%M:%S'
+                time_res = d1.strftime(db_time_format)
+                res_dict['published_time'] = time_res
+                
+                db_date_format = '%Y-%m-%d'
+                date_res = d2.strftime(db_date_format)
+                res_dict['published_date'] = date_res
             except Exception as e2:
                 print(e2)
                 content_parser.logger.info('NewsTalk date error {}, URL: {}'.format(e2, url))
+
 
     article_body_tag = soup.find('div', attrs = {'itemprop':'articleBody'})
     #print(article_body_tag)

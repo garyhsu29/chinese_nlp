@@ -62,54 +62,85 @@ def ltn_content_processor(rss_id, url):
     if time_tag_1:
         try:
             d1 = datetime.datetime.strptime(time_tag_1.get('content'), "%Y-%m-%dT%H:%M:%S+08:00") 
+            d2 = d1.date()
             d1 -= datetime.timedelta(hours=8)
-            db_date_format = '%Y-%m-%d %H:%M:%S'
-            date_res = d1.strftime(db_date_format)
-            res_dict['news_published_date'] = date_res
+            db_time_format = '%Y-%m-%d %H:%M:%S'
+            time_res = d1.strftime(db_time_format)
+            res_dict['published_time'] = time_res
+            
+            db_date_format = '%Y-%m-%d'
+            date_res = d2.strftime(db_date_format)
+            res_dict['published_date'] = date_res
         except Exception as e1:
             try:
-                d1 = datetime.datetime.strptime(time_tag_1.get('content'), "%Y-%m-%dT%H:%M:%SZ") 
+                d1 = datetime.datetime.strptime(time_tag_1.get('content'), "%Y-%m-%dT%H:%M:%SZ")
+                d2 = d1.date()
                 d1 -= datetime.timedelta(hours=8)
-                db_date_format = '%Y-%m-%d %H:%M:%S'
-                date_res = d1.strftime(db_date_format)
-                res_dict['news_published_date'] = date_res
+                db_time_format = '%Y-%m-%d %H:%M:%S'
+                time_res = d1.strftime(db_time_format)
+                res_dict['published_time'] = time_res
+                
+                db_date_format = '%Y-%m-%d'
+                date_res = d2.strftime(db_date_format)
+                res_dict['published_date'] = date_res
             except Exception as e2:
                 print('LTN date error {}, URL: {}'.format(e2, url))
-                #content_parser.logger.info('LTN date error {}, URL: {}'.format(e2, url))
+                content_parser.logger.info('LTN date error {}, URL: {}'.format(e2, url))
     elif time_tag_2:
         try:
             d1 = datetime.datetime.strptime(time_tag_2.get('content'), "%Y-%m-%dT%H:%M:%S+08:00")
+            d2 = d1.date()
             d1 -= datetime.timedelta(hours=8)
-            db_date_format = '%Y-%m-%d %H:%M:%S'
-            date_res = d1.strftime(db_date_format)
-            res_dict['news_published_date'] = date_res
+            db_time_format = '%Y-%m-%d %H:%M:%S'
+            time_res = d1.strftime(db_time_format)
+            res_dict['published_time'] = time_res
+            
+            db_date_format = '%Y-%m-%d'
+            date_res = d2.strftime(db_date_format)
+            res_dict['published_date'] = date_res
         except Exception as e1:
             try:
-                d1 = datetime.datetime.strptime(time_tag_2.get('content'), "%Y-%m-%dT%H:%M:%SZ") 
+                d1 = datetime.datetime.strptime(time_tag_2.get('content'), "%Y-%m-%dT%H:%M:%SZ")
+                d2 = d1.date()
                 d1 -= datetime.timedelta(hours=8)
-                db_date_format = '%Y-%m-%d %H:%M:%S'
-                date_res = d1.strftime(db_date_format)
-                res_dict['news_published_date'] = date_res
+                db_time_format = '%Y-%m-%d %H:%M:%S'
+                time_res = d1.strftime(db_time_format)
+                res_dict['published_time'] = time_res
+                
+                db_date_format = '%Y-%m-%d'
+                date_res = d2.strftime(db_date_format)
+                res_dict['published_date'] = date_res
             except Exception as e2:
                 print('LTN date error {}, URL: {}'.format(e2, url))
-                #content_parser.logger.info('LTN date error: {}, URL:{}'.format(e2, url))
+                content_parser.logger.info('LTN date error: {}, URL:{}'.format(e2, url))
     elif time_tag_3:
         try:
             d1 = datetime.datetime.strptime(time_tag_3.get_text(), "%Y-%m-%d %H:%M")
+            d2 = d1.date()
             d1 -= datetime.timedelta(hours=8)
-            db_date_format = '%Y-%m-%d %H:%M:%S'
-            date_res = d1.strftime(db_date_format)
-            res_dict['news_published_date'] = date_res
+            db_time_format = '%Y-%m-%d %H:%M:%S'
+            time_res = d1.strftime(db_time_format)
+            res_dict['published_time'] = time_res
+            
+            db_date_format = '%Y-%m-%d'
+            date_res = d2.strftime(db_date_format)
+            res_dict['published_date'] = date_res
         except Exception as e1:
             try:
                 d1 = datetime.datetime.strptime(time_tag_3.get_text(), "%Y-%m-%d %H:%M:%S")
+                d2 = d1.date()
                 d1 -= datetime.timedelta(hours=8)
-                db_date_format = '%Y-%m-%d %H:%M:%S'
-                date_res = d1.strftime(db_date_format)
-                res_dict['news_published_date'] = date_res
+                db_time_format = '%Y-%m-%d %H:%M:%S'
+                time_res = d1.strftime(db_time_format)
+                res_dict['published_time'] = time_res
+                
+                db_date_format = '%Y-%m-%d'
+                date_res = d2.strftime(db_date_format)
+                res_dict['published_date'] = date_res
             except Exception as e2:
                 print('LTN date error {}, URL: {}'.format(e2, url))
-                #content_parser.logger.info('LTN date error: {}, URL:{}'.format(e2, url))
+                content_parser.logger.info('LTN date error: {}, URL:{}'.format(e2, url))
+                
                 
 
     article_body_tag = soup.find('div', attrs = {'itemprop':'articleBody'})

@@ -44,9 +44,16 @@ def yahoo_content_processor(rss_id, url):
     if time_tag:
         try:
             d1 = datetime.datetime.strptime(time_tag['datetime'], "%Y-%m-%dT%H:%M:%S.%fZ")
-            db_date_format = '%Y-%m-%d %H:%M:%S'
-            res = d1.strftime(db_date_format)
-            res_dict['news_published_date'] = res
+            db_time_format = '%Y-%m-%d %H:%M:%S'
+            res_time = d1.strftime(db_time_format)
+            res_dict['published_time'] = res_time
+
+            d2 = d1 + datetime.timedelta(hours=8)
+            d2 = d2.date()
+            db_date_format = '%Y-%m-%d'
+            res_date = d2.strftime(db_date_format)
+            res_dict['published_date'] = res_date
+
         except Exception as e:
             logging.error(e)
             print(e)

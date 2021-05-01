@@ -12,6 +12,7 @@ from wordcloud import WordCloud
 from tf_idf import customize_tfidf
 import pytz
 from datetime import datetime
+import time
 
 
 font = os.path.join(cur_dir_name, 'SourceHanSansTW-Regular.otf')
@@ -53,6 +54,14 @@ def get_keywords_by_date():
 	kw_df['published_date'] = kw_df['published_date'].dt.date
 	return kw_df
 
+@st.cache(allow_output_mutation = True)
+def get_company_overview():
+	company_df = query_from_db("""SELECT ent_text as company_name, cast(ADDTIME(news_published_date, '8:00:0') as DATE) as published_date, COUNT(*) as count
+		FROM news_db.news_kw_view 
+		WHERE ent_text in (SELECT company_name FROM news_db.yahoo_stock_companies) and ent_type = 'ORG' and ADDTIME(news_published_date, '8:00:0') > '2021-01-19'
+		GROUP BY ent_text, cast(ADDTIME(news_published_date, '8:00:0') as DATE);""")
+	return company_df
+
 def get_ner_by_date(selected_date):
 	ner_df = query_from_db("""SELECT CAST(nkv.news_published_date AS DATE) AS published_date, nkv.ent_text, nkv.ent_type 
 		FROM news_db.news_kw_view nkv
@@ -60,7 +69,7 @@ def get_ner_by_date(selected_date):
 	return ner_df
 
 if __name__ == '__main__':
-	module = st.sidebar.selectbox('Mode: ', ['Crawling DB analysis', 'News Analysis (Basic Count)', 'New Analysis (TF-IDF)', 'New Analysis (NER Count)'])
+	module = st.sidebar.selectbox('Mode: ', ['Crawling DB analysis', 'News Analysis (Basic Count)', 'New Analysis (TF-IDF)', 'New Analysis (NER Count)', 'News Analysis (companies)'])
 	if module == 'Crawling DB analysis':
 		mode = st.sidebar.selectbox('Mode: ', ['Overview (Parse All)', 'Overview (Raw RSS)', 
 			'Detailed (Raw RSS)', 'Overview (Parse Success)', 'Datailed (Parse Success)', 'Overview (Parse Failed)', 'Detailed (Parse Failed)'])
@@ -252,11 +261,14 @@ if __name__ == '__main__':
 		ent_type_raw = st.selectbox('Entity Type: ', ['Person', "Organization"])
 		ent_type_dict = {'Person': 'PERSON', 'Organization':"ORG"}
 		ent_type = ent_type_dict[ent_type_raw]
+		start = time.time()
 		ner_df = get_ner_by_date(selected_date)
+		st.write("Finish query in {} seconds".format(time.time() - start))
 		ner_df = ner_df.drop(columns = ['published_date'])
 		ner_df = ner_df[ner_df['ent_type'] == ent_type].groupby(['ent_text']).agg('count')['ent_type'].sort_values(ascending = False)
 		topn = st.slider('Most Common Words', 0, 50, 10, 1)
 		my_wordcloud = WordCloud(max_words = topn, background_color='white',font_path=font, width=700, height=300)
+		#st.write(ner_df)
 		my_wordcloud.generate_from_frequencies(ner_df)
 		image = my_wordcloud.to_image()
 		st.image(image)
@@ -265,4 +277,28 @@ if __name__ == '__main__':
 		fig = go.Figure([go.Bar(x = counts[::-1], y = words[::-1], orientation='h')])
 		fig.update_layout(font_size = 12)
 		st.write(fig)
+
+	elif module == 'News Analysis (companies)':
+		end_date = datetime.now(tz = pytz.timezone('Asia/Taipei')).date()
+		start_date = datetime.strptime("2021-01-19", "%Y-%m-%d").date()
+		selected_date = st.date_input('Select date: ', end_date, min_value = start_date  , max_value = end_date)
+		
+		company_df = get_company_overview()
+		company_df = company_df[company_df['published_date'] == selected_date]
+		company_df = company_df.drop(columns = ['published_date'])
+		company_df = company_df.set_index('company_name')
+		company_df = company_df['count'].astype(int)
+		company_df = company_df.sort_values(ascending = False)
+		topn = st.slider('Most Common Words', 0, 50, 10, 1)
+		my_wordcloud = WordCloud(max_words = topn, background_color='white',font_path=font, width=700, height=300)
+		my_wordcloud.generate_from_frequencies(company_df)
+		image = my_wordcloud.to_image()
+		st.image(image)
+		words = company_df.index[:topn]
+		counts = company_df.values[:topn]
+		fig = go.Figure([go.Bar(x = counts[::-1], y = words[::-1], orientation='h')])
+		fig.update_layout(font_size = 12)
+		st.write(fig)
+
+
 		
