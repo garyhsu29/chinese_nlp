@@ -178,7 +178,11 @@ class RssParser(object):
                 for index, match in enumerate(re.finditer(r'(\<link\>)(.+?)(\<\/link\>)', web_content)):
                     if index < 2:
                         continue
-                    self.rss_source_category_dict[rss_source][rss_category].append((match.group(2), 'Yahoo Source 2'))
+                    new_match = re.search(r'(\<\/link\>)(.+?)(\<link\>)(http\S+)', match.group(2))
+                    if new_match:
+                        self.rss_source_category_dict[rss_source][rss_category].append((new_match.group(4), 'Yahoo Source 2'))
+                    else:
+                        self.rss_source_category_dict[rss_source][rss_category].append((match.group(2), 'Yahoo Source 2'))
             except Exception as e:
                 logging.error("Yahoo rss parser (2): {}".format(e))
 
