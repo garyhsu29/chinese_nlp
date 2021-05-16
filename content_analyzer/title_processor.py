@@ -105,7 +105,7 @@ def title_level_analysis(raw_df):
      
 
 
-raw_df = query_from_db("SELECT * FROM news_db.financial_title_view LIMIT 1000;")
+raw_df = query_from_db("SELECT news_id, news_title FROM news_db.financial_title_view LIMIT 100;")
 print("Finish load the data in {} seconds".format(time.time() - start))
 title_level_analysis(raw_df)
 mydb.close()
