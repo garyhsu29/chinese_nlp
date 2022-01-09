@@ -26,7 +26,7 @@ logging.basicConfig(level=logging.INFO, filename=os.path.join(DIR_PATH, 'logs', 
 
 
 
-with open(os.path.join(parent_dir, 'configs', 'loc2server.config'), 'rb') as f:
+with open(os.path.join(parent_dir, 'configs', 'server2server.config'), 'rb') as f:
     configs = pickle.load(f)
 
 mydb = mysql.connector.connect(
