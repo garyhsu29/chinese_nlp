@@ -45,8 +45,8 @@ def insert_title_level_info(title_words: list, title_pos:list , news_id, ws_appr
                 #print("INSERT INTO news_db.news_words (news_sent_id, word_index, word, word_pos, ws_approach) VALUES ({}, {}, {}, {}, {})".format(news_sent_id, word_index, word, word_pos, ws_approach))
 
             except Exception as e:
-                logging.error('Insert word pos error: {}\n News Sent ID: {}'.format(e, news_sent_id))
-                print('Insert word pos error: {}\nNews Sent ID: {}\nWs_approach: {}'.format(e, news_sent_id, ws_approach))
+                logging.error('Insert word pos error: {}\n News Sent ID: {}'.format(e, news_id))
+                print('Insert word pos error: {}\nNews Sent ID: {}\nWs_approach: {}'.format(e, news_id, ws_approach))
                 mydb.rollback()
             else:
                 #print("else")
