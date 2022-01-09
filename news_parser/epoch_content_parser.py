@@ -61,7 +61,7 @@ def epoch_content_processor(rss_id, url):
             
             db_date_format = '%Y-%m-%d'
             date_res = d2.strftime(db_date_format)
-            res_dict['published_date'] = date_res
+            res_dict['news_published_date'] = date_res
         except Exception as e1:
             try:
                 d1 = datetime.datetime.strptime(time_tag.get('content'), "%Y-%m-%dT%H:%M:%SZ") 
@@ -73,7 +73,7 @@ def epoch_content_processor(rss_id, url):
                 
                 db_date_format = '%Y-%m-%d'
                 date_res = d2.strftime(db_date_format)
-                res_dict['published_date'] = date_res
+                res_dict['news_published_date'] = date_res
             except Exception as e2:
                 print(e2)
                 content_parser.logger.info('Epoch date error {}'.format(e2))
