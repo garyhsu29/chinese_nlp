@@ -54,7 +54,7 @@ def get_keywords_by_date():
 def get_company_overview(selected_date):
 	company_df = query_from_db("""SELECT nkv.ent_text as company_name, COUNT(*) as count
 		FROM news_db.news_kw_view  nkv
-		WHERE EXISTS (SELECT 1 FROM news_db.yahoo_stock_companies ysc WHERE nkv.ent_text = ysc.company_name) and ent_type = 'ORG' and published_date = '{}'
+		WHERE EXISTS (SELECT 1 FROM news_db.stock_companies ysc WHERE nkv.ent_text = ysc.company_name) and ent_type = 'ORG' and published_date = '{}'
 		GROUP BY ent_text""".format(selected_date))
 	return company_df
 
@@ -265,7 +265,7 @@ if __name__ == '__main__':
 		ent_type = ent_type_dict[ent_type_raw]
 		start = time.time()
 		ner_df = get_ner_by_date(selected_date)
-		st.write("Finish query in {} seconds".format(time.time() - start))
+		
 		ner_df = ner_df.drop(columns = ['published_date'])
 		ner_df = ner_df[ner_df['ent_type'] == ent_type].groupby(['ent_text']).agg('count')['ent_type'].sort_values(ascending = False)
 		topn = st.slider('Most Common Words', 0, 50, 10, 1)
