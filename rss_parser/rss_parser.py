@@ -245,10 +245,10 @@ class RssParser(object):
                 rss_source, rss_category = re.search(r'\<title\>.+\n\t\t\t{}'.format(self.CDATA_BLOCK), web_content).group(1).split()
                 rss_source = rss_source.strip()
                 rss_category = rss_category.strip()
-                for index, match in enumerate(re.finditer(r'(\<link\>)(.+?)(<\/link\>)', web_content)):
+                for index, match in enumerate(re.finditer(r'\<link\>\<\!\[CDATA\[(.+?)from=rss\]\]\>\<\/link\>', web_content)):
                     if index < 1:
                         continue
-                    self.rss_source_category_dict[rss_source][rss_category].append((match.group(2), 'ETToday'))
+                    self.rss_source_category_dict[rss_source][rss_category].append((match.group(1), 'ETToday'))
             except Exception as e:
                 logging.error("Ettoday rss parser: {}".format(e))
                 logging.error('Error Url: {}'.format(url))

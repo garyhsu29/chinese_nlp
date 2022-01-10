@@ -47,7 +47,7 @@ def get_fail_parse_data():
 def get_keywords_by_date():
 	kw_df = query_from_db("""SELECT published_date, news_keywords 
 		FROM news_db.news_contents
-		WHERE news_keywords is not NULL and news_keywords != '' and published_date > '2021-01-19';""")
+		WHERE news_keywords is not NULL and news_keywords != '' and published_date > '2022-01-01';""")
 	return kw_df
 
 @st.cache(allow_output_mutation = True)
@@ -62,6 +62,17 @@ def get_ner_by_date(selected_date):
 	ner_df = query_from_db("""SELECT nkv.published_date, nkv.ent_text, nkv.ent_type 
 		FROM news_db.news_kw_view nkv
 		WHERE nkv.published_date  = '{}';""".format(selected_date))
+
+	# ner_df = query_from_db("""(SELECT 
+	# 	`nn`.`ent_text` AS `ent_text`,
+	# 	`nn`.`ent_type` AS `ent_type`,
+	# 	`nc`.`published_date` AS `published_date`
+	# FROM
+	# 	((`news_db`.`news_ners` `nn`
+	# 	JOIN `news_db`.`news_sents` `ns` ON ((`ns`.`news_sent_id` = `nn`.`news_sent_id`)))
+	# 	JOIN `news_db`.`news_contents` `nc` ON ((`nc`.`news_id` = `ns`.`news_id`)))
+	# WHERE
+	# 	(`nn`.`ent_type` IN ('ORG' , 'PERSON') AND nc.published_date = '{}')) """.format(selected_date))
 	return ner_df
 
 def get_top_news(selected_date):
@@ -101,7 +112,7 @@ if __name__ == '__main__':
 			st.title("How many rss feed per day?")
 			last_date = max(count_df['DATE'])
 			first_date = min(count_df['DATE'])
-			start_date = st.date_input('Start Date: ', last_date - timedelta(days=0), min_value = first_date  , max_value = last_date)
+			start_date = st.date_input('Start Date: ', last_date - timedelta(days=1), min_value = first_date  , max_value = last_date)
 			end_date = st.date_input('End Date: ', last_date, min_value = first_date, max_value = last_date)
 			new_df = count_df[(count_df['DATE'] >= start_date) & (count_df['DATE'] <= end_date)]
 			top_5_source = new_df.groupby(['rss_source']).agg(sum).sort_values(by = ['COUNT']).index[-5:].values
@@ -135,7 +146,7 @@ if __name__ == '__main__':
 			st.title("How many rss feed parsed successfully per day?")
 			last_date = max(success_df['DATE'])
 			first_date = min(success_df['DATE'])
-			start_date = st.date_input('Start Date: ', last_date - timedelta(days=0), min_value = first_date  , max_value = last_date)
+			start_date = st.date_input('Start Date: ', last_date - timedelta(days=1), min_value = first_date  , max_value = last_date)
 			end_date = st.date_input('End Date: ', last_date, min_value = first_date, max_value = last_date)
 			new_df = success_df[(success_df['DATE'] >= start_date) & (success_df['DATE'] <= end_date)]
 			top_5_source = new_df.groupby(['rss_source']).agg(sum).sort_values(by = ['COUNT']).index[-5:].values
@@ -169,7 +180,7 @@ if __name__ == '__main__':
 			st.title("How many rss feed parsed wrongly per day?")
 			last_date = max(fail_df['DATE'])
 			first_date = min(fail_df['DATE'])
-			start_date = st.date_input('Start Date: ', last_date - timedelta(days=0), min_value = first_date  , max_value = last_date)
+			start_date = st.date_input('Start Date: ', last_date - timedelta(days=1), min_value = first_date  , max_value = last_date)
 			end_date = st.date_input('End Date: ', last_date, min_value = first_date, max_value = last_date)
 			new_df = fail_df[(fail_df['DATE'] >= start_date) & (fail_df['DATE'] <= end_date)]
 			top_5_source = new_df.groupby(['rss_source']).agg(sum).sort_values(by = ['COUNT']).index[-5:].values
@@ -188,7 +199,7 @@ if __name__ == '__main__':
 			all_df['all_count'] = all_df.apply(lambda x: x['success_count'] + x['fail_count'], axis = 1)
 			last_date = max(all_df['DATE'])
 			first_date = min(all_df['DATE'])
-			start_date = st.date_input('Start Date: ', last_date - timedelta(days=0), min_value = first_date  , max_value = last_date)
+			start_date = st.date_input('Start Date: ', last_date - timedelta(days=1), min_value = first_date  , max_value = last_date)
 			end_date = st.date_input('End Date: ', last_date, min_value = first_date, max_value = last_date)
 			new_df = all_df[(all_df['DATE'] >= start_date) & (all_df['DATE'] <= end_date)]
 
@@ -263,9 +274,7 @@ if __name__ == '__main__':
 		ent_type_raw = st.selectbox('Entity Type: ', ['Person', "Organization"])
 		ent_type_dict = {'Person': 'PERSON', 'Organization':"ORG"}
 		ent_type = ent_type_dict[ent_type_raw]
-		start = time.time()
 		ner_df = get_ner_by_date(selected_date)
-		
 		ner_df = ner_df.drop(columns = ['published_date'])
 		ner_df = ner_df[ner_df['ent_type'] == ent_type].groupby(['ent_text']).agg('count')['ent_type'].sort_values(ascending = False)
 		topn = st.slider('Most Common Words', 0, 50, 10, 1)
@@ -284,10 +293,9 @@ if __name__ == '__main__':
 		end_date = datetime.now(tz = pytz.timezone('Asia/Taipei')).date()
 		start_date = datetime.strptime("2021-01-19", "%Y-%m-%d").date()
 		selected_date = st.date_input('Select date: ', end_date, min_value = start_date  , max_value = end_date)
-		
 		company_df = get_company_overview(selected_date)
-		#company_df = company_df[company_df['published_date'] == selected_date]
-		#company_df = company_df.drop(columns = ['published_date'])
+		# company_df = company_df[company_df['published_date'] == selected_date]
+		# company_df = company_df.drop(columns = ['published_date'])
 		company_df = company_df.set_index('company_name')
 		company_df = company_df['count'].astype(int)
 		company_df = company_df.sort_values(ascending = False)
