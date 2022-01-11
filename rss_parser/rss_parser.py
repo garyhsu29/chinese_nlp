@@ -575,20 +575,16 @@ class RssParser(object):
     
     def udn_rss_urls_extractor(self):
         udn_rss_url_dict = {}
-        udn_rss_landing_url = 'https://money.udn.com/rssfeed/lists/1001'
+        udn_rss_landing_url = 'https://udn.com/rssfeed/lists/1001'
         r = requests.get(udn_rss_landing_url, headers = self.headers)
         web_content = r.text
         soup = BeautifulSoup(web_content, 'lxml')
-        for group_index, group in enumerate(soup.find_all('div', class_ = 'group')):
-            if group_index < 1:
-                continue
-            for dt in group.find_all('dt'):
-                category = dt.get_text()
-                category_url = dt.find('a').get('href')
-                if category and category_url:
-                    udn_rss_url_dict[category] = category_url
+        for dt in soup.find_all('dt'):
+            url_raw = dt.find('a')
+            if url_raw and url_raw.get('href').find('rssfeed') != -1 and url_raw.text.strip():
+                udn_rss_url_dict[url_raw.text.strip()] = url_raw.get('href')
         return udn_rss_url_dict
-    
+        
     def rss_insert(self):
         for news_source in self.rss_source_category_dict.keys():
             for news_category in self.rss_source_category_dict[news_source].keys():
