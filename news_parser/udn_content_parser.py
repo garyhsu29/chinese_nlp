@@ -134,7 +134,7 @@ def udn_content_processor(rss_id, url):
                     content_temp.append(p.get_text().strip())
         if len(a_tags):
             for a in a_tags:
-                if a.get('href') and a['href'] == '#'
+                if a.get('href') and a['href'] == '#':
                     if a.get_text().strip() and 'www' in a['href']:
                         links.append(a['href'])
                         links_descs.append(a.get_text().strip())
