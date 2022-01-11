@@ -47,11 +47,27 @@ def udn_content_processor(rss_id, url):
     if description_tag:
         res_dict['news_description'] = html.unescape(description_tag['content'])
 
-    time_tag = soup.find('div', attrs = {'class': 'shareBar__info--author'})
-
+    time_tag2 = soup.find('div', attrs = {'class': 'shareBar__info--author'})
+    time_tag  = soup.find('meta', attrs = {'name':'date'})
     if time_tag:
         try:
-            d1 = datetime.datetime.strptime(time_tag.find('span').text, "%Y-%m-%d %H:%M")
+            d1 = datetime.datetime.strptime(time_tag.get('content'), "%Y/%m/%d %H:%M:%S")
+            d2 = d1.date()
+            d1 -= datetime.timedelta(hours=8)
+            db_time_format = '%Y-%m-%d %H:%M:%S'
+            time_res = d1.strftime(db_time_format)
+            res_dict['published_time'] = time_res
+            
+            db_date_format = '%Y-%m-%d'
+            date_res = d2.strftime(db_date_format)
+            res_dict['published_date'] = date_res 
+        except Exception as e1:
+            content_parser.logger.info('UDN date error {}\n{}'.format(e1,time_tag))
+            print(e1)
+            print(time_tag)
+    elif time_tag2:
+        try:
+            d1 = datetime.datetime.strptime(time_tag2.find('span').text, "%Y-%m-%d %H:%M")
             d2 = d1.date()
             d1 -= datetime.timedelta(hours=8)
             db_time_format = '%Y-%m-%d %H:%M:%S'
@@ -63,7 +79,7 @@ def udn_content_processor(rss_id, url):
             res_dict['published_date'] = date_res
         except Exception as e1:
             try:
-                d_temp = re.search('(\d{4}\-\d{2}\-\d{2}\s\d{2}\:\d{2})', time_tag.text).group(0)
+                d_temp = re.search('(\d{4}\-\d{2}\-\d{2}\s\d{2}\:\d{2})', time_tag2.text).group(0)
                 d1 = datetime.datetime.strptime(d_temp, "%Y-%m-%d %H:%M") 
                 d2 = d1.date()
                 d1 -= datetime.timedelta(hours=8)
@@ -76,7 +92,7 @@ def udn_content_processor(rss_id, url):
                 res_dict['published_date'] = date_res
             except Exception as e2:
                 try:
-                    d1 = datetime.datetime.strptime(time_tag.get('content'), "%Y-%m-%d %H:%M:%S") 
+                    d1 = datetime.datetime.strptime(time_tag2.get('content'), "%Y-%m-%d %H:%M:%S") 
                     d2 = d1.date()
                     d1 -= datetime.timedelta(hours=8)
                     db_time_format = '%Y-%m-%d %H:%M:%S'
@@ -88,8 +104,9 @@ def udn_content_processor(rss_id, url):
                     res_dict['published_date'] = date_res
                 except Exception as e3:
                     print(e3)
-                    content_parser.logger.info('Epoch date error {}'.format(e3))
+                    content_parser.logger.info('UDN date error {}'.format(e3))
     article_body_tag = soup.find('div', attrs = {'id':'article_body'})
+    article_body_tag2 = soup.find('section', attrs = {'id':'article_body'})
     content_temp, links, links_descs = [], [], []
     if article_body_tag:
         p_tags = article_body_tag.find_all('p', attrs = {'class': None})
@@ -107,7 +124,24 @@ def udn_content_processor(rss_id, url):
                         links.append(a['href'])
                         links_descs.append(html.unescape(a.get_text().strip()))
             res_dict['news_related_url'] = links
-            res_dict['news_related_url_desc'] = links_descs      
+            res_dict['news_related_url_desc'] = links_descs
+    elif article_body_tag2:
+        p_tags = article_body_tag2.find_all('p', attrs = {'class': None})
+        a_tags = article_body_tag2.find_all('a')
+        if p_tags:
+            for p in p_tags:
+                if p.get_text().strip() and p.get_text().strip() != 'facebook':
+                    content_temp.append(p.get_text().strip())
+        if len(a_tags):
+            for a in a_tags:
+                if len(a):
+                    if a['href'] == '#':
+                        continue
+                    if a.get_text().strip() and 'www' in a['href']:
+                        links.append(a['href'])
+                        links_descs.append(a.get_text().strip())
+            res_dict['news_related_url'] = links
+            res_dict['news_related_url_desc'] = links_descs  
     content = '\n'.join(content_temp).strip()
     if content:
         res_dict['news'] = html.unescape(content)
