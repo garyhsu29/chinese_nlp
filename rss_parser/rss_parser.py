@@ -140,6 +140,22 @@ class RssParser(object):
         
         self.cw_rss_url_dict = {'天下雜誌 - 評論': 'https://www.cw.com.tw/RSS/opinion.xml', 
                                 '天下雜誌 - 文章': 'https://www.cw.com.tw/RSS/cw_content.xml'}
+        self.moneydj_rss_urls_dict = {'MoneyDJ - 頭條新聞':'https://www.moneydj.com/KMDJ/RssCenter.aspx?svc=NR&fno=1&arg=MB010000',
+        'MoneyDJ - 總體經濟':'https://www.moneydj.com/KMDJ/RssCenter.aspx?svc=NR&fno=1&arg=MB020000',
+        'MoneyDJ - 國際股市':'https://www.moneydj.com/KMDJ/RssCenter.aspx?svc=NR&fno=1&arg=MB03',
+        'MoneyDJ - 台股':'https://www.moneydj.com/KMDJ/RssCenter.aspx?svc=NR&fno=1&arg=MB06',
+        'MoneyDJ - 深滬港股':'https://www.moneydj.com/KMDJ/RssCenter.aspx?svc=NR&fno=1&arg=MB10',
+        'MoneyDJ - 亞股':'https://www.moneydj.com/KMDJ/RssCenter.aspx?svc=NR&fno=1&arg=MB030200',
+        'MoneyDJ - 美股':'https://www.moneydj.com/KMDJ/RssCenter.aspx?svc=NR&fno=1&arg=MB030100',
+        'MoneyDJ - 歐股':'https://www.moneydj.com/KMDJ/RssCenter.aspx?svc=NR&fno=1&arg=MB030300',
+        'MoneyDJ - 基金':'https://www.moneydj.com/KMDJ/RssCenter.aspx?svc=NR&fno=1&arg=MB110000',
+        'MoneyDJ - 期權':'https://www.moneydj.com/KMDJ/RssCenter.aspx?svc=NR&fno=1&arg=MB120000',
+        'MoneyDJ - 商品原物料':'https://www.moneydj.com/KMDJ/RssCenter.aspx?svc=NR&fno=1&arg=MB080000',
+        'MoneyDJ - 外匯市場':'https://www.moneydj.com/KMDJ/RssCenter.aspx?svc=NR&fno=1&arg=MB040100',
+        'MoneyDJ - 債券市場':'https://www.moneydj.com/KMDJ/RssCenter.aspx?svc=NR&fno=1&arg=MB040200',
+        'MoneyDJ - 產業情報':'https://www.moneydj.com/KMDJ/RssCenter.aspx?svc=NR&fno=1&arg=MB07',
+        'MoneyDJ - 金融市場':'https://www.moneydj.com/KMDJ/RssCenter.aspx?svc=NR&fno=1&arg=MB070300',
+        'MoneyDJ - 科技脈動':'https://www.moneydj.com/KMDJ/RssCenter.aspx?svc=NR&fno=1&arg=MB070100'}
         self.eco_report_landing_url = 'https://money.udn.com/rssfeed/lists/1001'
         
         # ------- Single url rss source ------- #
@@ -447,8 +463,26 @@ class RssParser(object):
                     self.rss_source_category_dict[rss_source][rss_category].append((match.group(2), 'CW'))
 
             except Exception as e:
-                logging.error("epoch rss parser: {}".format(e))
+                logging.error("CW rss parser: {}".format(e))
                 logging.error('Error Url: {}'.format(url))
+
+    def moneydj_rss_parser(self):
+        for key, url in self.moneydj_rss_urls_dict.items():
+            try:
+                r = requests.get(url, headers = headers)
+                r.encoding='utf-8'
+                web_content = r.text
+                rss_source, rss_category = key.split(' - ')
+                for index, match in enumerate(re.finditer(r'(\<link\>)(.+?)(\<\/link\>)', web_content)):
+                    if index < 1:
+                        continue
+                    self.rss_source_category_dict[rss_source][rss_category].append((match.group(2), 'MoneyDJ'))
+            except Exception as e:
+                logging.error("MoneyDJ rss parser: {}".format(e))
+                logging.error('Error Url: {}'.format(url))
+    
+    
+
 
     # ------- Single rss url parsers ------- #
     def msn_rss_parser(self):
@@ -647,7 +681,7 @@ rss_parser.ttv_rss_parser()
 rss_parser.bw_rss_parser()
 rss_parser.epoch_rss_parser()
 rss_parser.cw_rss_parser()
-
+rss_parser.moneydj_rss_parser()
 
 # ------- Update the signle url source ------- #
 

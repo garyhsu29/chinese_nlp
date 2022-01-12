@@ -112,7 +112,7 @@ if __name__ == '__main__':
 			st.title("How many rss feed per day?")
 			last_date = max(count_df['DATE'])
 			first_date = min(count_df['DATE'])
-			start_date = st.date_input('Start Date: ', last_date - timedelta(days=1), min_value = first_date  , max_value = last_date)
+			start_date = st.date_input('Start Date: ', last_date - timedelta(days=3), min_value = first_date  , max_value = last_date)
 			end_date = st.date_input('End Date: ', last_date, min_value = first_date, max_value = last_date)
 			new_df = count_df[(count_df['DATE'] >= start_date) & (count_df['DATE'] <= end_date)]
 			top_5_source = new_df.groupby(['rss_source']).agg(sum).sort_values(by = ['COUNT']).index[-5:].values
@@ -146,7 +146,7 @@ if __name__ == '__main__':
 			st.title("How many rss feed parsed successfully per day?")
 			last_date = max(success_df['DATE'])
 			first_date = min(success_df['DATE'])
-			start_date = st.date_input('Start Date: ', last_date - timedelta(days=1), min_value = first_date  , max_value = last_date)
+			start_date = st.date_input('Start Date: ', last_date - timedelta(days=3), min_value = first_date  , max_value = last_date)
 			end_date = st.date_input('End Date: ', last_date, min_value = first_date, max_value = last_date)
 			new_df = success_df[(success_df['DATE'] >= start_date) & (success_df['DATE'] <= end_date)]
 			top_5_source = new_df.groupby(['rss_source']).agg(sum).sort_values(by = ['COUNT']).index[-5:].values
@@ -180,7 +180,7 @@ if __name__ == '__main__':
 			st.title("How many rss feed parsed wrongly per day?")
 			last_date = max(fail_df['DATE'])
 			first_date = min(fail_df['DATE'])
-			start_date = st.date_input('Start Date: ', last_date - timedelta(days=1), min_value = first_date  , max_value = last_date)
+			start_date = st.date_input('Start Date: ', last_date - timedelta(days=3), min_value = first_date  , max_value = last_date)
 			end_date = st.date_input('End Date: ', last_date, min_value = first_date, max_value = last_date)
 			new_df = fail_df[(fail_df['DATE'] >= start_date) & (fail_df['DATE'] <= end_date)]
 			top_5_source = new_df.groupby(['rss_source']).agg(sum).sort_values(by = ['COUNT']).index[-5:].values
@@ -199,7 +199,7 @@ if __name__ == '__main__':
 			all_df['all_count'] = all_df.apply(lambda x: x['success_count'] + x['fail_count'], axis = 1)
 			last_date = max(all_df['DATE'])
 			first_date = min(all_df['DATE'])
-			start_date = st.date_input('Start Date: ', last_date - timedelta(days=1), min_value = first_date  , max_value = last_date)
+			start_date = st.date_input('Start Date: ', last_date - timedelta(days=3), min_value = first_date  , max_value = last_date)
 			end_date = st.date_input('End Date: ', last_date, min_value = first_date, max_value = last_date)
 			new_df = all_df[(all_df['DATE'] >= start_date) & (all_df['DATE'] <= end_date)]
 
@@ -310,7 +310,7 @@ if __name__ == '__main__':
 		fig.update_layout(font_size = 12)
 		st.write(fig)
 	elif module == 'Top News':
-		end_date = datetime.now(tz = pytz.timezone('Asia/Taipei')).date() - timedelta(days = 2)
+		end_date = datetime.now(tz = pytz.timezone('Asia/Taipei')).date() - timedelta(days = 3)
 		start_date = datetime.strptime("2021-01-19", "%Y-%m-%d").date()
 		selected_date = st.date_input('Select date: ', end_date, min_value = start_date  , max_value = end_date)
 		df = get_top_news(selected_date)
