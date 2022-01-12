@@ -469,7 +469,7 @@ class RssParser(object):
     def moneydj_rss_parser(self):
         for key, url in self.moneydj_rss_urls_dict.items():
             try:
-                r = requests.get(url, headers = headers)
+                r = requests.get(url, headers = self.headers)
                 r.encoding='utf-8'
                 web_content = r.text
                 rss_source, rss_category = key.split(' - ')
